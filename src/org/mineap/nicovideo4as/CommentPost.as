@@ -1,12 +1,24 @@
 package org.mineap.nicovideo4as
 {
+	import flash.errors.IOError;
+	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.HTTPStatusEvent;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
 	import flash.net.URLRequestHeader;
+	
+	import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
+	
+	[Event(name="commentPostSuccess", type="CommentPost")]
+	[Event(name="commentPostFail", type="CommentPost")]
+	[Event(name="apiGetPostkeyError", type="CommentPost")]
+	[Event(name="commentGetError", type="CommentPost")]
+	[Event(name="xmlParseError", type="CommentPost")]
+	[Event(name="httpResponseStatus", type="HTTPStatusEvent")]
 	
 	/**
 	 * ニコニコ動画の指定された動画に対してコメントの投稿を行います。
@@ -28,7 +40,8 @@ package org.mineap.nicovideo4as
 		private var _threadID:String;
 		private var _isPremium:String;
 		
-		public static const API_GET_FLV_ACCESS_ERROR:String = "ApiGetFlvAccessError";
+		public static const COMMENT_POST_SUCCESS:String = "CommentPostSuccess";
+		public static const COMMENT_POST_FAIL:String = "CommentPostFail";
 		public static const COMMENT_GET_ERROR:String = "CommentGetError";
 		public static const XML_PARSE_ERROR:String = "XmlParseError";
 		public static const API_GET_POST_KEY_ACCESS_ERROR:String = "ApiGetPostkeyError";
@@ -54,18 +67,23 @@ package org.mineap.nicovideo4as
 		 * @return 
 		 * 
 		 */
-		public function postComment(videoId:String, mail:String, comment:String, vpos:int, isPremium:String):void{
+		public function postComment(videoId:String, 
+									mail:String, 
+									comment:String, 
+									vpos:int, 
+									isPremium:String, 
+									apiAccess:ApiGetFlvAccess):void{
 			
 			this._comment = comment;
 			this._mail = mail;
 			this._vpos = vpos;
 			this._isPremium = isPremium;
 			
-			this._commentLoader.addApiGetFlvAccessListener(IOErrorEvent.IO_ERROR, apiAccessErrorHandler);
-			this._commentLoader.addCommentLoaderListener(IOErrorEvent.IO_ERROR, commentLoaderErrorHandler);
-			this._commentLoader.addCommentLoaderListener(Event.COMPLETE, commentGetSuccess);
+			this._commentLoader.addEventListener(CommentLoader.COMMENT_GET_SUCCESS, commentGetSuccess);
+			this._commentLoader.addEventListener(CommentLoader.COMMENT_GET_FAIL, commentLoaderErrorHandler);
+			this._commentLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatusEventHandler);
 			//TODO コメントローダーにAPIアクセサを渡さないと行けない。
-			this._commentLoader.getComment(videoId, 1, false, null);
+			this._commentLoader.getComment(videoId, 1, false, apiAccess);
 			
 		}
 		
@@ -121,7 +139,15 @@ package org.mineap.nicovideo4as
 		 * @param messageServerUrl メッセージサーバーのURLです。コメントXMLから取得します。
 		 * 
 		 */
-		public function post(postKey:String, user_id:String, ticket:String, mail:String, comment:String, vpos:String, thread:String, isPremium:String, messageServerUrl:String):void{
+		public function post(postKey:String, 
+							 user_id:String, 
+							 ticket:String, 
+							 mail:String, 
+							 comment:String, 
+							 vpos:String, 
+							 thread:String, 
+							 isPremium:String, 
+							 messageServerUrl:String):void{
 				
 			var getComment:URLRequest = new URLRequest(unescape(messageServerUrl));
 			getComment.method = "POST";
@@ -140,50 +166,53 @@ package org.mineap.nicovideo4as
 			
 			getComment.data = chat;
 			
+			this._postLoader.addEventListener(Event.COMPLETE, commentPostCompleteHandler);
+			this._postLoader.addEventListener(IOErrorEvent.IO_ERROR, commentPostErrorHandler);
+			this._postLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatusEventHandler);
 			this._postLoader.dataFormat=URLLoaderDataFormat.TEXT;
 			this._postLoader.load(getComment);
 			
-		}
-		
-		
-		/**
-		 * コメント取得前のAPIアクセスに失敗した場合、IOErrorEventを発行します。
-		 * @param event
-		 * 
-		 */
-		private function apiAccessErrorHandler(event:IOErrorEvent):void{
-			trace(event + ":" + event.text);
-			dispatchEvent(new IOErrorEvent(API_GET_FLV_ACCESS_ERROR, false, false, event.text));
 		}
 		
 		/**
 		 * コメントの取得に失敗した場合、IOErrorEventを発行します。
 		 * @param event
 		 */
-		private function commentLoaderErrorHandler(event:IOErrorEvent):void{
+		private function commentLoaderErrorHandler(event:ErrorEvent):void{
 			trace(event + ":" + event.text);
 			dispatchEvent(new IOErrorEvent(COMMENT_GET_ERROR, false, false, event.text));
 		}
 		
 		/**
-		 * コメント取得用のCommentLoaderが持つAPIアクセス用Loaderにリスナをセットします。
+		 * 
 		 * @param event
-		 * @param listener
 		 * 
 		 */
-		public function addCommentLoaderApiListener(event:String, listener:Function):void{
-			this._commentLoader.addApiGetFlvAccessListener(event, listener);
+		private function httpResponseStatusEventHandler(event:HTTPStatusEvent):void{
+			trace(event + ":" + event.status);
+			dispatchEvent(event);
 		}
 		
 		/**
-		 * コメント取得用のCommentLoaderにリスナをセットします。
+		 * 
 		 * @param event
-		 * @param listener
 		 * 
 		 */
-		public function addCommentLoaderListener(event:String, listener:Function):void{
-			this._commentLoader.addCommentLoaderListener(event, listener);
+		private function commentPostCompleteHandler(event:Event):void{
+			trace(event);
+			dispatchEvent(new Event(COMMENT_POST_SUCCESS));
 		}
+		
+		/**
+		 * 
+		 * @param event
+		 * 
+		 */
+		private function commentPostErrorHandler(event:IOErrorEvent):void{
+			trace(event);
+			dispatchEvent(new IOErrorEvent(COMMENT_POST_FAIL, false, false, event.text));
+		}
+		
 		
 		/**
 		 * 

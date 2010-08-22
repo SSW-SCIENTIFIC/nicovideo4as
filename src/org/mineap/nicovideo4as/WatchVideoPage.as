@@ -12,8 +12,6 @@ package org.mineap.nicovideo4as
 	
 	import mx.messaging.SubscriptionInfo;
 	
-	import org.mineap.NNDD.util.PathMaker;
-
 	[Event(name="watchSuccess", type="org.mineap.nicovideo4as.WatchVideoPage")]
 	[Event(name="watchFail", type="org.mineap.nicovideo4as.WatchVideoPage")]
 	[Event(name="httpResponseStatus", type="HTTPStatusEvent")]

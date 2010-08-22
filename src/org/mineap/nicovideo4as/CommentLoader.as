@@ -19,8 +19,8 @@ package org.mineap.nicovideo4as
 	import org.mineap.nicovideo4as.loader.api.ApiGetWaybackkeyAccess;
 	import org.mineap.nicovideo4as.model.NgUp;
 	
-	[Event(name="commentGetSuccess", type="Event")]
-	[Event(name="commentGetFail", type="ErrorEvent")]
+	[Event(name="commentGetSuccess", type="CommentLoader")]
+	[Event(name="commentGetFail", type="CommentLoader")]
 	[Event(name="httpResponseStatus", type="HTTPStatusEvent")]
 	
 	/**

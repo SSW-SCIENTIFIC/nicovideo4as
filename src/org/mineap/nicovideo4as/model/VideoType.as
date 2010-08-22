@@ -1,7 +1,5 @@
 package org.mineap.nicovideo4as.model
 {
-	import org.mineap.NNDD.model.VideoType;
-
 	/**
 	 * 動画のタイプを表す列挙型です。
 	 * 

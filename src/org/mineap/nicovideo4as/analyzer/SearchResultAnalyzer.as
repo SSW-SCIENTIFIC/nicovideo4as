@@ -2,7 +2,6 @@ package org.mineap.nicovideo4as.analyzer
 {
 	import flash.html.HTMLLoader;
 	
-	import org.mineap.NNDD.model.VideoType;
 	import org.mineap.nicovideo4as.model.PageLink;
 	import org.mineap.nicovideo4as.model.SearchResultItem;
 	import org.mineap.nicovideo4as.util.VideoTypeUtil;
