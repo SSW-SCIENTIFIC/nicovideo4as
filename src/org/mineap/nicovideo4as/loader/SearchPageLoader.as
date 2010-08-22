@@ -1,4 +1,4 @@
-package org.mineap.loader
+package org.mineap.nicovideo4as.loader
 {
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;

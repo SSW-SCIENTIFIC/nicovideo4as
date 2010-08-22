@@ -1,4 +1,4 @@
-package org.mineap.loader
+package org.mineap.nicovideo4as.loader
 {
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
