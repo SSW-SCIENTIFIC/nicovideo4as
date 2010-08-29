@@ -20,13 +20,6 @@ package org.mineap.nicovideo4as.model
 		 */
 		public static const TAG:int = 1;
 		
-		/**
-		 * 検索種別の文字列表現です
-		 */
-		public static const NICO_SEARCH_TYPE_TEXT:Array = new Array(
-			"キーワード", "タグ"//, "タグを"
-		);
-		
 		public function SearchType()
 		{
 		}
