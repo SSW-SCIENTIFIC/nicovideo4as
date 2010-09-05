@@ -41,41 +41,46 @@ package org.mineap.nicovideo4as.analyzer
 		 * 
 		 */
 		public function analyze(result:Object):Boolean{
-			
-			var related_video:XML = new XML(result);
-			
-			this.status = related_video.@status;
-			
-			if(status == "ok"){
+			try{
 				
-				this.total_count = related_video.total_count;
+				var related_video:XML = new XML(result);
 				
-				this.page_count = related_video.page_count;
+				this.status = related_video.@status;
 				
-				this.data_count = related_video.data_count;
-				
-				for each(var video:XML in related_video.elements("video")){
+				if(status == "ok"){
 					
-					var url:String = video.url;
-					var thumbnail:String = video.thumbnail;
-					var title:String = decodeURIComponent(video.title);
-					var view:int = video.view;
-					var comment:int = video.comment;
-					var mylist:int = video.mylist;
-					var length:int = video.length;
-					var time:Number = video.time;	//TODO 投稿日を表していると思われるこの時間がどうやったら正しい日時に変換できるか不明
-				
-					var item:RelationResultItem = new RelationResultItem(url, thumbnail, title, view, comment, mylist, length, time);
+					this.total_count = related_video.total_count;
 					
-					videos.push(item);
+					this.page_count = related_video.page_count;
 					
+					this.data_count = related_video.data_count;
+					
+					for each(var video:XML in related_video.elements("video")){
+						
+						var url:String = video.url;
+						var thumbnail:String = video.thumbnail;
+						var title:String = decodeURIComponent(video.title);
+						var view:int = video.view;
+						var comment:int = video.comment;
+						var mylist:int = video.mylist;
+						var length:int = video.length;
+						var time:Number = video.time;	//TODO 投稿日を表していると思われるこの時間がどうやったら正しい日時に変換できるか不明
+						
+						var item:RelationResultItem = new RelationResultItem(url, thumbnail, title, view, comment, mylist, length, time);
+						
+						videos.push(item);
+						
+					}
+					
+					return true;
+				}else{
+					return false;
 				}
 				
-				return true;
-			}else{
-				return false;
+			}catch(error:Error){
+				trace(error.getStackTrace());
 			}
-			
+			return false;
 		}
 		
 	}
