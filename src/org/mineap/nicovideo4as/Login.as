@@ -181,7 +181,7 @@ package org.mineap.nicovideo4as
 			}
 			
 			if (event.responseURL.indexOf(LOGIN_FAIL_MESSAGE) != -1){
-				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, LOGIN_FAIL_MESSAGE));
+				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, LOGIN_FAIL_MESSAGE + ",status:" + event.status));
 				
 				return;
 			}
