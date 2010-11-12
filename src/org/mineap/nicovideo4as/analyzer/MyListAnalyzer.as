@@ -28,7 +28,7 @@ package org.mineap.nicovideo4as.analyzer
 				return vector;
 			}
 			
-			var items:XMLList = (xml.channel as XMLList).children();
+			var items:XMLList = (xml.channel as XMLList).child("item");
 			
 			for each(var xml:XML in items)
 			{
@@ -40,7 +40,7 @@ package org.mineap.nicovideo4as.analyzer
 				if(xml.guid.@isPermaLink == "true"){
 					myListItem.isPermaLink = true;
 				}
-				myListItem.pubDate = new Date(xml.pubDate);
+				myListItem.pubDate = getDate(xml.pubDate);
 				myListItem.description = xml.description;
 				
 				vector.push(myListItem);
@@ -48,6 +48,39 @@ package org.mineap.nicovideo4as.analyzer
 			
 			return vector;
 		}
+		
+		private function getDate(string:String):Date
+		{
+		
+			//Thu, 13 Sep 2007 15:59:30 +0900
+			var pattern:RegExp = new RegExp("(\\S+), (\\d\\d) (\\S+) (\\d\\d\\d\\d) (\\d\\d):(\\d\\d):(\\d\\d)");
+			
+			var newDate:Date = new Date();
+			
+			try{
+				
+				var array:Array = string.match(pattern);
+				
+				var dayOfTheWeek:String = array[1];
+				var year:String = array[4];
+				var month:String = array[3];
+				var date:String = array[2];
+				var h:String = array[5];
+				var m:String = array[6];
+				var s:String = array[7];
+				
+				//曜日 月 日 年 時:分:秒
+				newDate = new Date(String(dayOfTheWeek + " " + month + " " + date + " " + h + ":" + m + ":" + s));
+				
+			}catch(e:Error){
+				trace(e + "\n" + e.getStackTrace());
+			}
+			
+			return newDate;
+			
+			
+		}
+		
 		
 	}
 }
