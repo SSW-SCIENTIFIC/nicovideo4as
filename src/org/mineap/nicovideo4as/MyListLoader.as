@@ -13,11 +13,10 @@ package org.mineap.nicovideo4as
 	/**
 	 * マイリストの一覧を取得します
 	 * 
-	 * TODO : APIを使った方式に作り直すべき
-	 * 
 	 * @author shiraminekeisuke(MineAP)
-	 * 
+	 * @deprecated org.mineap.nicovideo4as.loader.MyListLoader
 	 */
+	[Deprecated(replacement="org.mineap.nicovideo4as.loader.MyListLoader")]
 	public class MyListLoader extends EventDispatcher
 	{
 		

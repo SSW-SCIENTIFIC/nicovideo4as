@@ -5,6 +5,13 @@ package org.mineap.nicovideo4as.loader
 	
 	import org.mineap.nicovideo4as.Login;
 	
+	/**
+	 * マイリスト情報を取得するクラス。
+	 * ログインが必要な非公開のマイリストも取得できる。
+	 * 
+	 * @author shiraminekeisuke(MineAP)
+	 * 
+	 */
 	public class MyListLoader extends PublicMyListLoader
 	{
 		
@@ -20,6 +27,14 @@ package org.mineap.nicovideo4as.loader
 			}
 		}
 		
+		/**
+		 * 指定されたメールアドレス、パスワードを使って、指定されたマイリストIDのマイリストを取得します。
+		 * 
+		 * @param myListId マイリストID
+		 * @param mailAddr ログインに使うメールアドレス
+		 * @param password ログインパスワード
+		 * @see org.mineap.nicovideo4as.analyzer.MyListAnalyzer
+		 */
 		public function getMyListWithLogin(myListId:String, mailAddr:String, password:String):void
 		{
 			this._myListId = myListId;

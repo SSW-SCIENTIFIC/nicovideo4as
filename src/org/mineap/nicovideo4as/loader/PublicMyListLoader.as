@@ -5,8 +5,9 @@ package org.mineap.nicovideo4as.loader
 	import flash.net.URLVariables;
 
 	/**
+	 * 公開マイリストの取得を行うクラスです。
 	 * 
-	 * @author shiraminekeisuke
+	 * @author shiraminekeisuke(MineAP)
 	 * 
 	 */
 	public class PublicMyListLoader extends URLLoader
@@ -14,6 +15,11 @@ package org.mineap.nicovideo4as.loader
 		
 		public static const MYLIST_PAGE_URL:String = "http://www.nicovideo.jp/mylist/";
 		
+		/**
+		 * 
+		 * @param request
+		 * 
+		 */
 		public function PublicMyListLoader(request:URLRequest = null)
 		{
 			if (request != null)
@@ -23,9 +29,11 @@ package org.mineap.nicovideo4as.loader
 		}
 		
 		/**
+		 * 指定されたマイリストIDのマイリスト情報を取得します。
+		 * 指定するマイリストは公開マイリストである必要があります。
 		 * 
-		 * @param myListId
-		 * 
+		 * @param myListId 公開マイリストID
+		 * @see org.mineap.nicovideo4as.analyzer.MyListAnalyzer
 		 */
 		public function getMyList(myListId:String):void{
 			

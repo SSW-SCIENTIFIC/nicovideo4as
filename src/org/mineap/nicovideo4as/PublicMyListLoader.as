@@ -6,6 +6,13 @@ package org.mineap.nicovideo4as
 	
 	import mx.collections.ArrayCollection;
 	
+	/**
+	 * 公開マイリストにアクセスするためのクラス
+	 * 
+	 * @author shiraminekeisuke (MineAP)
+	 * @deprecated org.mineap.nicovideo4as.loader.PublicMyListLoader
+	 */
+	[Deprecated(replacement="org.mineap.nicovideo4as.loader.PublicMyListLoader")]
 	public class PublicMyListLoader
 	{
 		
