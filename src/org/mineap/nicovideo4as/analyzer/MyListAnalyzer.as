@@ -70,7 +70,7 @@ package org.mineap.nicovideo4as.analyzer
 				var s:String = array[7];
 				
 				//曜日 月 日 年 時:分:秒
-				newDate = new Date(String(dayOfTheWeek + " " + month + " " + date + " " + h + ":" + m + ":" + s));
+				newDate = new Date(String(dayOfTheWeek + " " + month + " " + date + " " + year + " " + h + ":" + m + ":" + s));
 				
 			}catch(e:Error){
 				trace(e + "\n" + e.getStackTrace());
