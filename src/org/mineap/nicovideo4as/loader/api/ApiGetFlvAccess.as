@@ -21,6 +21,8 @@ package org.mineap.nicovideo4as.loader.api
 		
 		public static const NICO_API_GET_FLV:String = "http://flapi.nicovideo.jp/api/getflv/";
 		
+		private var _url:String = NICO_API_GET_FLV;
+		
 		/**
 		 * 
 		 * @param request
@@ -28,9 +30,7 @@ package org.mineap.nicovideo4as.loader.api
 		 */
 		public function ApiGetFlvAccess(request:URLRequest = null)
 		{
-			if(request != null){
-				this.load(request);
-			}
+			super(request);
 		}
 		
 		/**
@@ -56,7 +56,7 @@ package org.mineap.nicovideo4as.loader.api
 			}
 			
 			var getAPIRequest:URLRequest;
-			var url:String = NICO_API_GET_FLV + videoID;
+			var url:String = url + videoID;
 			
 			getAPIRequest = new URLRequest(url);
 			getAPIRequest.method = "GET";
@@ -64,5 +64,16 @@ package org.mineap.nicovideo4as.loader.api
 			
 			this.load(getAPIRequest);
 		}
+
+		public function get url():String
+		{
+			return _url;
+		}
+
+		public function set url(value:String):void
+		{
+			_url = value;
+		}
+
 	}
 }

@@ -1,5 +1,6 @@
 package org.mineap.nicovideo4as
 {
+	import flash.errors.IOError;
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -14,8 +15,8 @@ package org.mineap.nicovideo4as
 	import org.mineap.nicovideo4as.analyzer.CommentAnalyzer;
 	import org.mineap.nicovideo4as.analyzer.GetFlvResultAnalyzer;
 	import org.mineap.nicovideo4as.analyzer.GetThreadKeyResultAnalyzer;
-	import org.mineap.nicovideo4as.api.ApiGetThreadkeyAccess;
 	import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
+	import org.mineap.nicovideo4as.loader.api.ApiGetThreadkeyAccess;
 	import org.mineap.nicovideo4as.loader.api.ApiGetWaybackkeyAccess;
 	import org.mineap.nicovideo4as.model.NgUp;
 	
@@ -67,6 +68,7 @@ package org.mineap.nicovideo4as
 		public function CommentLoader()
 		{
 			this._commentLoader = new URLLoader();
+			this._apiGetThreadkeyAccess = new ApiGetThreadkeyAccess();
 		}
 		
 		/**
@@ -81,7 +83,12 @@ package org.mineap.nicovideo4as
 		 * @param when 過去ログを取得する際の取得開始時刻
 		 * @param waybackkey 過去ログを取得する際に必要なwaybackkey
 		 */
-		public function getComment(videoId:String, count:int, isOwnerComment:Boolean, apiAccess:ApiGetFlvAccess, when:Date = null, waybackkey:String = null):void
+		public function getComment(videoId:String, 
+								   count:int, 
+								   isOwnerComment:Boolean, 
+								   apiAccess:ApiGetFlvAccess, 
+								   when:Date = null,
+								   waybackkey:String = null):void
 		{
 			this._count = count;
 			
@@ -107,9 +114,8 @@ package org.mineap.nicovideo4as
 			this._messageServerUrl = _getflvAnalyzer.ms;
 			
 			// getthreadkeyにアクセス
-			this._apiGetThreadkeyAccess = new ApiGetThreadkeyAccess();
-			this._apiGetThreadkeyAccess.addEventListener(ApiGetThreadkeyAccess.SUCCESS, _getComment);
-			this._apiGetThreadkeyAccess.addEventListener(ApiGetThreadkeyAccess.FAIL, function(event:ErrorEvent):void{
+			this._apiGetThreadkeyAccess.addEventListener(Event.COMPLETE, _getComment);
+			this._apiGetThreadkeyAccess.addEventListener(IOErrorEvent.IO_ERROR, function(event:IOErrorEvent):void{
 				trace(event);
 				dispatchEvent(new IOErrorEvent(COMMENT_GET_FAIL, false, false, _getflvAnalyzer.result));
 				close();
@@ -117,7 +123,7 @@ package org.mineap.nicovideo4as
 			this._apiGetThreadkeyAccess.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, function(event:HTTPStatusEvent):void{
 				trace(event);
 			});
-			this._apiGetThreadkeyAccess.getthreadkey(this._getflvAnalyzer.threadId);
+			this._apiGetThreadkeyAccess.getThreadkey(this._getflvAnalyzer.threadId);
 			
 		}
 		
@@ -140,7 +146,7 @@ package org.mineap.nicovideo4as
 			if(this._getflvAnalyzer.needs_key == 1 && !this._isOwnerComment ){ // 投コメは取りに行かないよ
 				
 				var getThreadKeyResultAnalyzer:GetThreadKeyResultAnalyzer = new GetThreadKeyResultAnalyzer();
-				getThreadKeyResultAnalyzer.analyze((event.currentTarget as ApiGetThreadkeyAccess).result);
+				getThreadKeyResultAnalyzer.analyze((event.currentTarget as ApiGetThreadkeyAccess).data);
 				
 				// 公式 
 				/*
@@ -180,7 +186,6 @@ package org.mineap.nicovideo4as
 					xml.@waybackkey = this._waybackkey;
 				}
 			}
-//			trace(xml.toXMLString());
 			getComment.data = xml;
 			
 			this._commentLoader.dataFormat=URLLoaderDataFormat.TEXT;
@@ -313,7 +318,11 @@ package org.mineap.nicovideo4as
 		{
 			return _xml;
 		}
-
 		
+		public function set threadKeyAccessApiUrl(url:String):void
+		{
+			this._apiGetThreadkeyAccess.url = url;
+		}
+
 	}
 }

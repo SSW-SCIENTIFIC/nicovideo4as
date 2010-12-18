@@ -21,9 +21,7 @@ package org.mineap.nicovideo4as.loader.api
 		 */
 		public function ApiGetRelation(request:URLRequest=null)
 		{
-			if(request != null){
-				this.load(request);
-			}
+			super(request);
 		}
 		
 		/**

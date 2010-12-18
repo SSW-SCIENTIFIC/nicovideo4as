@@ -13,6 +13,13 @@ package org.mineap.nicovideo4as.loader.api
 		
 		public static const GET_THUMB_INFO_API_URL:String = "http://ext.nicovideo.jp/api/getthumbinfo/";
 		
+		private var _url:String = GET_THUMB_INFO_API_URL;
+		
+		/**
+		 * 
+		 * @param request
+		 * 
+		 */
 		public function ApiGetThumbInfoAccess(request:URLRequest = null)
 		{
 			if (request != null)
@@ -21,15 +28,30 @@ package org.mineap.nicovideo4as.loader.api
 			}
 		}
 		
+		/**
+		 * 
+		 * @param videoId
+		 * 
+		 */
 		public function getThumbInfo(videoId:String):void
 		{
 			
-			var url:String = GET_THUMB_INFO_API_URL + videoId;
+			var targetUrl:String = this._url + videoId;
 			
-			var request:URLRequest = new URLRequest(url);
+			var request:URLRequest = new URLRequest(targetUrl);
 			
 			this.load(request);
 			
+		}
+
+		public function get url():String
+		{
+			return _url;
+		}
+
+		public function set url(value:String):void
+		{
+			_url = value;
 		}
 		
 		
