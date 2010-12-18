@@ -65,6 +65,24 @@ package org.mineap.nicovideo4as.util
 				}
 			}
 			
+			var count:int = 0;
+			var temp:String = result.replace("\\/", "/");
+			while(temp != result && count < 100)
+			{
+				result = temp;
+				temp = result.replace("\\/", "/");
+				count++;
+			}
+			
+			count = 0;
+			temp = result.replace("\\\"", "\"");
+			while(temp != result && count < 100)
+			{
+				result = temp;
+				temp = result.replace("\\\"", "\"");
+				count++;
+			}
+				
 			return result;
 		}
 		

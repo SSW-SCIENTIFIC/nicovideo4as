@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<flexLibProperties includeAllClasses="true" version="3">
-  <includeClasses/>
-  <includeResources/>
+<flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
+  <includeClasses>
+    <classEntry path="org.mineap.nicovideo4as.loader.MyListLoader"/>
+    <classEntry path="org.mineap.nicovideo4as.analyzer.MyListAnalyzer"/>
+    <classEntry path="org.mineap.nicovideo4as.model.MyListItem"/>
+    <classEntry path="org.mineap.nicovideo4as.loader.api.ApiGetThumbInfoAccess"/>
+    <classEntry path="org.mineap.nicovideo4as.loader.api.ApiGetThreadkeyAccess"/>
+  </includeClasses>
+  <includeResources>
+    <resourceEntry destPath="org/mineap/.DS_Store" sourcePath="org/mineap/.DS_Store"/>
+    <resourceEntry destPath=".DS_Store" sourcePath=".DS_Store"/>
+  </includeResources>
   <namespaceManifests/>
 </flexLibProperties>

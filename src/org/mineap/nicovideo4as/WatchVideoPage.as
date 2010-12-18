@@ -12,6 +12,8 @@ package org.mineap.nicovideo4as
 	
 	import mx.messaging.SubscriptionInfo;
 	
+	import org.mineap.nicovideo4as.util.HtmlUtil;
+	
 	[Event(name="watchSuccess", type="org.mineap.nicovideo4as.WatchVideoPage")]
 	[Event(name="watchFail", type="org.mineap.nicovideo4as.WatchVideoPage")]
 	[Event(name="httpResponseStatus", type="HTTPStatusEvent")]
@@ -37,14 +39,7 @@ package org.mineap.nicovideo4as
 		</td>
 		</tr>
 		*/
-		private var descriptionPattern:RegExp = new RegExp(
-			"<tr>[^<]*" +
-			"<td style=\"background:#CCCFCF;\"><img src=\"http://res.nimg.jp/img/watch/ftit_description.png\" alt=\"動画の説明文\"></td>[^<]*" +
-			"<td width=\"100%\" class=\"font12\" style=\"background:#FFF;\">" + //[^<]*" +
-			"(.*)" +
-			"</td>[^<]*" +
-			"</tr>[^<]*" +
-			"<!--↑説明文↑-->");
+		private var descriptionPattern:RegExp = new RegExp("description:[^']*'(.*)'");
 		
 		//"<img src=\"http://res.nimg.jp/img/_.gif\" alt=\"動画の説明文\" class=\"video_des_tit\"></td>[^<]*<td width=\"100%\" style=\"background:#F9F9F9;\">(.*</p>)</td>[^<]*</tr>[^<]*</table>"
 		
@@ -159,7 +154,7 @@ package org.mineap.nicovideo4as
 				
 				var result:Array = descriptionPattern.exec(this._watchLoader.data);
 				if(result != null && result.length > 1){
-					var html:String = prefix + result[1] + suffix;
+					var html:String = prefix + HtmlUtil.convertCharacterCodeToCharacter(result[1]) + suffix;
 					
 					html = html.replace(fontSizePattern, replFN);
 					
