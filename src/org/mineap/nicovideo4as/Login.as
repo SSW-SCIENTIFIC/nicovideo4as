@@ -7,11 +7,14 @@ package org.mineap.nicovideo4as
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.events.TimerEvent;
+	import flash.net.Socket;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
-	import flash.net.URLRequestDefaults;
+	import flash.net.URLRequestMethod;
 	import flash.net.URLVariables;
 	import flash.utils.Timer;
+	
+	import org.mineap.nicovideo4as.loader.LoginChecker;
 
 	[Event(name="login_success", type="org.mineap.nicovideo4as.Login")]
 	[Event(name="login_fail", type="org.mineap.nicovideo4as.Login")]
@@ -20,7 +23,7 @@ package org.mineap.nicovideo4as
 	/**
 	 * ニコニコ動画へのログインリクエストを格納するクラスです。
 	 * 
-	 * @author shiraminekeisuke
+	 * @author shiraminekeisuke(MineAP)
 	 * 
 	 */
 	public class Login extends EventDispatcher
@@ -29,7 +32,11 @@ package org.mineap.nicovideo4as
 		private var _loginLoader:URLLoader;
 		private var _loginRequest:URLRequest;
 		private var _logoutLoader:URLLoader;
+		private var _loginChecker:LoginChecker;
 		private var _isRetry:Boolean = false;
+		private var _url:String = null;
+		private var _user:String = null;
+		private var _password:String = null;
 		
 		/**
 		 * ニコニコ動画のログインURLです。
@@ -81,27 +88,43 @@ package org.mineap.nicovideo4as
 		 * @param user ログイン名です。
 		 * @param password ログインパスワードです。
 		 * @param url ログインに使うURLです。
-		 * @param isDefault 今回設定したログインをデフォルトに設定するかどうかです
-		 * @param topPageUrl デフォルトのログイン設定を有効にするURLです。
 		 * @param isRetry このフラグがtrueで、かつIOエラーが発生したときに、ログアウト→ログインの順で一度だけ再試行します。
+		 * @param preCheck ログイン前に、既にログイン済みかどうかのチェックを行い、ログイン済みの場合はログイン処理を行いません。
 		 * @return 
 		 * 
 		 */
-		public function login(user:String, password:String, url:String=LOGIN_URL, isDefault:Boolean=true, topPageUrl:String=TOP_PAGE_URL, isRetry:Boolean = true):void{
-			if(isDefault){
-				setURLRequestDefaults(user, password, topPageUrl);
-			}
+		public function login(user:String, 
+							  password:String, 
+							  url:String=LOGIN_URL, 
+							  isRetry:Boolean = true,
+							  preCheck:Boolean = true):void{
 			
 			this._isRetry = isRetry;
+			this._url = url;
+			this._user = user;
+			this._password = password;
+			
+			if(preCheck){
+				this._loginChecker = new LoginChecker();
+				this._loginChecker.addEventListener(Event.COMPLETE, checkCompleteEventHandler);
+				this._loginChecker.addEventListener(IOErrorEvent.IO_ERROR, checkErrorEventHandler);
+				this._loginChecker.addEventListener(SecurityErrorEvent.SECURITY_ERROR, checkErrorEventHandler);
+				this._loginChecker.check(url);
+			}else{
+				loginInner();
+			}
+		}
+		
+		private function loginInner():void{
 			
 			this._loginLoader = new URLLoader();
 			
 			var variables:URLVariables = new URLVariables();
-			variables.mail = user;
-			variables.password = password;
+			variables.mail = this._user;
+			variables.password = this._password;
 			
-			this._loginRequest = new URLRequest(url);
-			this._loginRequest.method = "POST";
+			this._loginRequest = new URLRequest(this._url);
+			this._loginRequest.method = URLRequestMethod.POST;
 			this._loginRequest.data = variables;
 			
 			this._loginLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpCompleteHandler);
@@ -146,7 +169,7 @@ package org.mineap.nicovideo4as
 		}
 		
 		private function timerEventHandler(event:Event):void{
-			login(String(this._loginRequest.data.mail), String(this._loginRequest.data.password), LOGIN_URL, true, TOP_PAGE_URL, false);
+			login(String(this._loginRequest.data.mail), String(this._loginRequest.data.password), this._url, false);
 		}
 		
 		/**
@@ -189,18 +212,6 @@ package org.mineap.nicovideo4as
 			dispatchEvent(new Event(LOGIN_SUCCESS));
 		}
 		
-		/**
-		 * 指定されたURL下のページにアクセスする際のデフォルトユーザー名およびパスワードに、
-		 * 引数で指定された値を設定します。
-		 * @param user
-		 * @param password
-		 * @param url
-		 * @return 
-		 * 
-		 */
-		public function setURLRequestDefaults(user:String, password:String, url:String):void{
-			URLRequestDefaults.setLoginCredentialsForHost(url, user, password);
-		}
 		
 		
 		/**
@@ -222,9 +233,46 @@ package org.mineap.nicovideo4as
 			}catch(error:Error){
 				trace(error.getStackTrace());
 			}
+			try{
+				if(this._loginChecker != null){
+					this._loginChecker.close();
+				}
+			}catch(error:Error){
+				trace(error.getStackTrace());
+			}
+			
 			this._loginLoader = null;
 //			this._loginRequest = null;
 		}
+		
+		/**
+		 * 
+		 * @param event
+		 * 
+		 */
+		protected function checkCompleteEventHandler(event:Event):void
+		{
+			if(this._loginChecker.isAlreadyLogin){
+				// 既にログイン済み
+				dispatchEvent(new Event(LOGIN_SUCCESS));
+			}else{
+				// 未ログイン。ログイン試行。
+				loginInner();
+			}
+		}
+		
+		/**
+		 * 
+		 * @param event
+		 * 
+		 */
+		protected function checkErrorEventHandler(event:IOErrorEvent):void
+		{
+			// 通信路異常
+			dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, event.toString()));
+			close();
+		}
+		
 		
 	}
 }
