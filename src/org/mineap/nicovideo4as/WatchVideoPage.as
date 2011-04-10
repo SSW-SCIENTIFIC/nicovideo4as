@@ -39,6 +39,9 @@ package org.mineap.nicovideo4as
 		</td>
 		</tr>
 		*/
+		/**
+		 * 
+		 */
 		private var descriptionPattern:RegExp = new RegExp("description:[^']*'(.*)'");
 		
 		//"<img src=\"http://res.nimg.jp/img/_.gif\" alt=\"動画の説明文\" class=\"video_des_tit\"></td>[^<]*<td width=\"100%\" style=\"background:#F9F9F9;\">(.*</p>)</td>[^<]*</tr>[^<]*</table>"
@@ -63,7 +66,12 @@ package org.mineap.nicovideo4as
 		 */
 		private static const suffix:String = "</body>" +
 			"</html>";
-			
+		
+		/**
+		 * 
+		 */
+		private static const pubUser:String = "<a href=\"user/(.+)\"><img src=\"(.+)\" alt=\"(.+)\" class=\".+\"></a>";
+		
 		/**
 		 * "http://www.nicovideo.jp/watch/"を表す定数です
 		 */
@@ -181,6 +189,63 @@ package org.mineap.nicovideo4as
 				return "";
 			}
 			
+		}
+		
+		/**
+		 * 
+		 * @return 
+		 * 
+		 */
+		public function getPubUserId():String{
+			if(this._watchLoader != null && this._watchLoader.data != null){
+				var pubUserPattern:RegExp = new RegExp(pubUser);
+				var result:Array = pubUserPattern.exec(this._watchLoader.data);
+				if(result != null && result.length > 1){
+					return result[1];
+				}else{
+					return null;
+				}
+			}else{
+				return null;
+			}
+		}
+		
+		/**
+		 * 
+		 * @return 
+		 * 
+		 */
+		public function getPubUserIconUrl():String{
+			if(this._watchLoader != null && this._watchLoader.data != null){
+				var pubUserPattern:RegExp = new RegExp(pubUser);
+				var result:Array = pubUserPattern.exec(this._watchLoader.data);
+				if(result != null && result.length > 1){
+					return result[2];
+				}else{
+					return null;
+				}
+			}else{
+				return null;
+			}
+		}
+		
+		/**
+		 * 
+		 * @return 
+		 * 
+		 */
+		public function getPubUserName():String{
+			if(this._watchLoader != null && this._watchLoader.data != null){
+				var pubUserPattern:RegExp = new RegExp(pubUser);
+				var result:Array = pubUserPattern.exec(this._watchLoader.data);
+				if(result != null && result.length > 1){
+					return result[3];
+				}else{
+					return null;
+				}
+			}else{
+				return null;
+			}
 		}
 		
 		/**
