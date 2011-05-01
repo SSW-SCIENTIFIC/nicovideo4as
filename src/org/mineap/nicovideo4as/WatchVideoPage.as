@@ -68,9 +68,15 @@ package org.mineap.nicovideo4as
 			"</html>";
 		
 		/**
-		 * 
+		 * 投稿者が普通のユーザの時
 		 */
 		private static const pubUser:String = "<a href=\"user/(.+)\"><img src=\"(.+)\" alt=\"(.+)\" class=\".+\"></a>";
+		
+		/**
+		 * 投稿者がチャンネルの時
+		 * <a href="http://ch.nicovideo.jp/channel/ch639"><img src="http://icon.nimg.jp/channel/ch639.jpg?1303983084" alt="「俺の妹がこんなに可愛いわけがない」動画配信チャンネル" class="img_sq48"></a>
+		 */
+		private static const channel:String = "<a heaf=\"http://ch.nicovideo.jp/channel/(.+)\"><img src=\"(.+)\" alt=\"(.+)\" class=\".+\"></a>";
 		
 		/**
 		 * "http://www.nicovideo.jp/watch/"を表す定数です
@@ -247,6 +253,61 @@ package org.mineap.nicovideo4as
 				return null;
 			}
 		}
+		
+		/**
+		 * チャンネルを返す。
+		 * @return "ch639"など
+		 * 
+		 */
+		public function getChannel():String{
+			if (this._watchLoader != null && this._watchLoader.data != null)
+			{
+				var channelPattern:RegExp = new RegExp(channel);
+				var result:Array = channelPattern.exec(this._watchLoader.data);
+				if (result != null && result.length > 1)
+				{
+					return result[1];
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * チャンネルのアイコンURLを返す
+		 * @return 
+		 * 
+		 */
+		public function getChannelIconUrl():String{
+			if (this._watchLoader != null && this._watchLoader.data != null)
+			{
+				var channelPattern:RegExp = new RegExp(channel);
+				var result:Array = channelPattern.exec(this._watchLoader.data);
+				if (result != null && result.length > 1)
+				{
+					return result[2];
+				}
+			}
+			return null;
+		}
+		
+		/**
+		 * チャンネルの名前を返す
+		 * @return 
+		 * 
+		 */
+		public function getChannelName():String{
+			if (this._watchLoader != null && this._watchLoader.data != null)
+			{
+				var channelPattern:RegExp = new RegExp(channel);
+				var result:Array = channelPattern.exec(this._watchLoader.data);
+				if (result != null && result.length > 1)
+				{
+					return result[3];
+				}
+			}
+			return null;
+		}
+		
 		
 		/**
 		 * 
