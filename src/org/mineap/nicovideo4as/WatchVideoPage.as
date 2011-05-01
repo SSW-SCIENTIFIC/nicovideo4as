@@ -70,13 +70,13 @@ package org.mineap.nicovideo4as
 		/**
 		 * 投稿者が普通のユーザの時
 		 */
-		private static const pubUser:String = "<a href=\"user/(.+)\"><img src=\"(.+)\" alt=\"(.+)\" class=\".+\"></a>";
+		private static const pubUser:String = "<a href=\"user/([^\"]+)\"><img src=\"([^\"]+)\" alt=\"([^\"]+)\" class=\".+\"></a>";
 		
 		/**
 		 * 投稿者がチャンネルの時
 		 * <a href="http://ch.nicovideo.jp/channel/ch639"><img src="http://icon.nimg.jp/channel/ch639.jpg?1303983084" alt="「俺の妹がこんなに可愛いわけがない」動画配信チャンネル" class="img_sq48"></a>
 		 */
-		private static const channel:String = "<a heaf=\"http://ch.nicovideo.jp/channel/(.+)\"><img src=\"(.+)\" alt=\"(.+)\" class=\".+\"></a>";
+		private static const channel:String = "<a href=\"http://ch.nicovideo.jp/channel/([^\"]+)\"><img src=\"([^\"]+)\" alt=\"([^\"]+)\" class=\".+\"></a>";
 		
 		/**
 		 * "http://www.nicovideo.jp/watch/"を表す定数です
