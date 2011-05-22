@@ -8,6 +8,7 @@ package org.mineap.nicovideo4as
 	import flash.events.SecurityErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
+	import flash.net.URLVariables;
 	import flash.utils.unescapeMultiByte;
 	
 	import mx.messaging.SubscriptionInfo;
@@ -79,6 +80,11 @@ package org.mineap.nicovideo4as
 		private static const channel:String = "<a href=\"http://ch.nicovideo.jp/channel/([^\"]+)\"><img src=\"([^\"]+)\" alt=\"([^\"]+)\" class=\".+\"></a>";
 		
 		/**
+		 * 動画に未成年者向け警告がある時
+		 */
+		private static const harmful:String = "watch_harmful=1";
+		
+		/**
 		 * "http://www.nicovideo.jp/watch/"を表す定数です
 		 */
 		public static const WATCH_VIDEO_PAGE_URL:String = "http://www.nicovideo.jp/watch/";
@@ -114,11 +120,11 @@ package org.mineap.nicovideo4as
 		
 		/**
 		 * 
-		 * @param videoId
-		 * @param isEconomyMode
+		 * @param videoId 開く動画のID(スレッドIDでも可能)
+		 * @param watchHarmful 有害動画に指定されている動画を強制的に開くかどうか
 		 * 
 		 */
-		public function watchVideo(videoId:String):void{
+		public function watchVideo(videoId:String, watchHarmful:Boolean):void{
 			
 			this._videoId = videoId;
 			
@@ -127,6 +133,12 @@ package org.mineap.nicovideo4as
 			var watchURL:URLRequest = new URLRequest(mUrl);
 			watchURL.method = "GET";
 			watchURL.followRedirects = true;
+			
+			if(watchHarmful){
+				var variables:URLVariables = new URLVariables();
+				variables.watch_harmful = 1;
+				watchURL.data = variables;
+			}
 			
 			this._watchLoader.addEventListener(Event.COMPLETE, completeEventHandler);
 			this._watchLoader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
@@ -308,6 +320,24 @@ package org.mineap.nicovideo4as
 			return null;
 		}
 		
+		/**
+		 * この動画が有害であると判定されている場合にtrueを返します。
+		 * @return 
+		 * 
+		 */
+		public function checkHarmful():Boolean
+		{
+			if (this._watchLoader != null && this._watchLoader.data != null)
+			{
+				var str:String = getVideoId() + "?" + harmful;
+				
+				if ((this._watchLoader.data as String).indexOf(str) > -1)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 		
 		/**
 		 * 
