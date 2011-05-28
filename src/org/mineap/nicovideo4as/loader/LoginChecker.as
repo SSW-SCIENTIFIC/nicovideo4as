@@ -48,7 +48,7 @@ package org.mineap.nicovideo4as.loader
 		
 		protected function httpResponseStatusListener(event:HTTPStatusEvent):void
 		{
-			checkResponseHeader(event);
+			this.x_niconico_authflag_value = checkResponseHeader(event);
 		}
 		
 		protected function checkResponseHeader(event:HTTPStatusEvent):String{
@@ -60,7 +60,6 @@ package org.mineap.nicovideo4as.loader
 					break;
 				}
 			}
-			trace(value);
 			return value;
 		}
 		
