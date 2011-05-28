@@ -73,13 +73,11 @@ package org.mineap.nicovideo4as
 		
 		/**
 		 * ニコニコ動画にアクセスしてコメントを取得します。
-		 * threadIdが指定された場合はapiAccessの結果を使わずに指定されたthreadIdを使用します。
 		 * 
 		 * @param videoId コメントを取得したい動画の動画ID。
 		 * @param count 取得するコメントの数。
 		 * @param isOwnerComment 投稿者コメントかどうか
 		 * @param apiAccess getFlvにアクセスするApiGetFlvAccessオブジェクト
-		 * @param threadId スレッドID
 		 * @param when 過去ログを取得する際の取得開始時刻
 		 * @param waybackkey 過去ログを取得する際に必要なwaybackkey
 		 */
@@ -289,6 +287,16 @@ package org.mineap.nicovideo4as
 		}
 		
 		/**
+		 * APIの結果から取得したプレミアム会員かどうかの情報を返します。
+		 * @return プレミアム会員の時はtrueを返す
+		 * 
+		 */
+		public function get isPremium():Boolean
+		{
+			return this._getflvAnalyzer.isPremium;
+		}
+		
+		/**
 		 * 
 		 * @return 
 		 * 
@@ -309,16 +317,31 @@ package org.mineap.nicovideo4as
 			}
 		}
 
+		/**
+		 * このローダが取得したコメントの解析結果を返します
+		 * @return 
+		 * 
+		 */
 		public function get commentAnalzyer():CommentAnalyzer
 		{
 			return _commentAnalyzer;
 		}
 
+		/**
+		 * このローダーが取得したコメント(xml)を返します
+		 * @return 
+		 * 
+		 */
 		public function get xml():XML
 		{
 			return _xml;
 		}
 		
+		/**
+		 * スレッドキー取得するAPIのURLを設定します
+		 * @param url
+		 * 
+		 */
 		public function set threadKeyAccessApiUrl(url:String):void
 		{
 			this._apiGetThreadkeyAccess.url = url;
