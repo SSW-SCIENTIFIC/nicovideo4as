@@ -58,7 +58,13 @@ package org.mineap.nicovideo4as.analyzer
 				
 				for(var i:int = 0; i<loadCommentCount && i<items.length() ; i++){
 					var p:XML = items[i];
-					_comments[i] = new Comment(Number(p.attribute("vpos")), String(p.text()), String(p.attribute("mail")), String(p.attribute("user_id")), Number(p.attribute("no")), String(p.attribute("thread")));
+					_comments[i] = new Comment(Number(p.attribute("vpos")), 
+						String(p.text()), 
+						String(p.attribute("mail")), 
+						String(p.attribute("user_id")), 
+						Number(p.attribute("no")), 
+						String(p.attribute("thread")), 
+						Number(p.attribute("date")));
 				}
 				
 				return true;

@@ -15,7 +15,9 @@ package org.mineap.nicovideo4as.model
 		
 		private var _thread:String = "";
 		
-		public function Comment(vpos:Number, text:String, mail:String, user_id:String, no:Number, thread:String)
+		private var _date:Number = 0;
+		
+		public function Comment(vpos:Number, text:String, mail:String, user_id:String, no:Number, thread:String, date:Number)
 		{
 			
 			this._vpos = vpos;
@@ -24,9 +26,15 @@ package org.mineap.nicovideo4as.model
 			this._user_id = user_id;
 			this._no = no;
 			this._thread = thread;
+			this._date = date;
 			
 		}
 		
+		public function get date():Number
+		{
+			return _date;
+		}
+
 		public function get thread():String
 		{
 			return _thread;
