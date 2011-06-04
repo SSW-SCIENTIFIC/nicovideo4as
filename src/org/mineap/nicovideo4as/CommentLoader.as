@@ -274,6 +274,10 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function get economyMode():Boolean{
+			if(this._getflvAnalyzer == null)
+			{
+				return false;
+			}
 			return this._getflvAnalyzer.economyMode;
 		}
 		

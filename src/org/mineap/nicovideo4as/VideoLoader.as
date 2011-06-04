@@ -164,6 +164,9 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function get economyMode():Boolean{
+			if(this._analyzer == null){
+				return false;
+			}
 			return this._analyzer.economyMode;
 		}
 		
