@@ -79,6 +79,7 @@ package org.mineap.nicovideo4as.analyzer
 		
 		/**
 		 * ng_up
+		 * &ng_up=L=LiSAかわいいよLiSA&Ｌ=だーまえマジ天使
 		 */
 		public static const NG_UP_PATTERN:RegExp = new RegExp("&ng_up=([^&]*)");
 		
@@ -268,24 +269,32 @@ package org.mineap.nicovideo4as.analyzer
 				array = NG_UP_PATTERN.exec(result);
 				if(array != null && array.length > 1){
 					
-					var pattern:RegExp = new RegExp("\\*([^&]*)", "g");
-					pattern.lastIndex = array.index;
+					var pattern:RegExp = new RegExp("&([^&]*)", "g");	//"&ng_up=([^&]*)"
 					
 					while(true){
 						
-						array = pattern.exec(result);
-						
-						if(array == null || array.length <= 1){
-							break;
-						}
-						
+						// 結果を格納
 						var str:String = array[array.length-1];
 						var index:int = str.indexOf("=");
 						
 						var ngword:String = str.substring(0, index);
 						var changeValue:String = str.substring(index+1);
 						
+						// &hms=はニコ動の広場を指定するブロック。なのでこの先はスキップ。
+						if(ngword == "hms")
+						{
+							break;
+						}
+						
 						this._ng_ups.splice(this._ng_ups.length,0,new NgUp(ngword, changeValue));
+						
+						// 次へ
+						pattern.lastIndex = array.index + str.length;
+						array = pattern.exec(result);
+						
+						if(array == null || array.length <= 1){
+							break;
+						}
 						
 					}
 					
