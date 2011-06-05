@@ -73,18 +73,17 @@ package org.mineap.nicovideo4as
 		 * @param mailAddress ログイン用メールアドレス
 		 * @param password ログイン用パスワード
 		 * @param videoId 投稿する動画
-		 * @param mail コメントのコマンド
 		 * @param comment 投稿するコメント
+		 * @param mail コメントのコマンド
 		 * @param vpos 動画を投稿するvpos
-		 * @return 
 		 * @author edvakf
 		 */
 		public function postCommentWithLogin(
 			mailAddress:String,
 			password:String,
 			videoId:String, 
-			mail:String, 
 			comment:String, 
+			mail:String, 
 			vpos:int):void{
 			
 			this._videoId = videoId;
@@ -203,6 +202,12 @@ package org.mineap.nicovideo4as
 			getComment.method = "POST";
 			getComment.requestHeaders = new Array(new URLRequestHeader("Content-Type", "text/html"));
 			
+			var premium:String = "0";
+			if (isPremium)
+			{
+				premium = "1";
+			}
+			
 			//<chat thread="" vpos="" mail="184 " ticket="" user_id="" postkey="" premium="">test</chat>
 			var chat:XML = <chat />;
 			chat.@thread = thread;
@@ -211,7 +216,7 @@ package org.mineap.nicovideo4as
 			chat.@ticket = ticket;
 			chat.@user_id = user_id;
 			chat.@postkey = postKey;
-			chat.@premium = isPremium ? '0' : '1';
+			chat.@premium = premium;
 			chat.appendChild(comment);
 			
 			getComment.data = chat;
@@ -251,13 +256,22 @@ package org.mineap.nicovideo4as
 			trace(event);
 			try{
 				var resXml:XML = new XML((event.target as URLLoader).data);
-				if(resXml.chat_result.@no){
+				if (resXml.chat_result.@status != "0")
+				{
+					throw new Error("コメントの投稿に失敗:chat_result.@status=" + resXml.chat_result.@status);
+				}
+				
+				if (resXml.chat_result.@no != null)
+				{
 					this._no = resXml.chat_result.@no;
-				}else{
-					throw new Error("コメントの投稿に失敗");
+				}
+				else
+				{
+					throw new Error("コメントの投稿に失敗:no is null.");
 				}
 			}catch(error:Error){
-				dispatchEvent(new IOErrorEvent(COMMENT_POST_FAIL, false, false, error.getStackTrace()));
+				trace(error.getStackTrace());
+				dispatchEvent(new IOErrorEvent(COMMENT_POST_FAIL, false, false, error.toString()));
 				return;
 			}
 			dispatchEvent(new Event(COMMENT_POST_SUCCESS));
