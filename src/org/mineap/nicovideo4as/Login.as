@@ -115,6 +115,10 @@ package org.mineap.nicovideo4as
 			}
 		}
 		
+		/**
+		 * 
+		 * 
+		 */
 		private function loginInner():void{
 			
 			this._loginLoader = new URLLoader();
@@ -197,13 +201,12 @@ package org.mineap.nicovideo4as
 			
 			dispatchEvent(event);
 			
-			if (event.status != 302) {
+			if (event.status != 200 && event.status != 302) {
 				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, "status:" + event.status));
-				
 				return;
 			}
 			
-			var location:String;
+			var location:String = null;
 			for each(var header:Object in event.responseHeaders) {
 				if (header.name != null && header.name is String &&
 					(header.name as String).toLowerCase() == "location") {
@@ -212,7 +215,7 @@ package org.mineap.nicovideo4as
 				}
 			}
 			trace(location);
-			if (location && location.indexOf(LOGIN_FAIL_MESSAGE) != -1){
+			if (location != null && location.indexOf(LOGIN_FAIL_MESSAGE) != -1){
 				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, LOGIN_FAIL_MESSAGE + ",status:" + event.status));
 				
 				return;
