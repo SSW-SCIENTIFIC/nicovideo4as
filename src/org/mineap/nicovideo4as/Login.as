@@ -15,6 +15,7 @@ package org.mineap.nicovideo4as
 	import flash.utils.Timer;
 	
 	import org.mineap.nicovideo4as.loader.LoginChecker;
+	import org.mineap.nicovideo4as.model.NicoAuthFlagType;
 
 	[Event(name="login_success", type="org.mineap.nicovideo4as.Login")]
 	[Event(name="login_fail", type="org.mineap.nicovideo4as.Login")]
@@ -206,18 +207,29 @@ package org.mineap.nicovideo4as
 				return;
 			}
 			
-			var location:String = null;
+			var value:String;
 			for each(var header:Object in event.responseHeaders) {
 				if (header.name != null && header.name is String &&
-					(header.name as String).toLowerCase() == "location") {
-					location = header.value;
+					(header.name as String).toLowerCase() == "x-niconico-authflag") {
+					value = header.value;
 					break;
 				}
 			}
-			trace(location);
-			if (location != null && location.indexOf(LOGIN_FAIL_MESSAGE) != -1){
-				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, LOGIN_FAIL_MESSAGE + ",status:" + event.status));
-				
+			
+			trace("x_niconico_authflag=" + value);
+			if (value == NicoAuthFlagType.NICO_AUTH_FLAG_FAILURE.Type)
+			{
+				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, LOGIN_FAIL_MESSAGE));
+				return;
+			}
+			else if (value == NicoAuthFlagType.NICO_AUTH_FLAG_SUCCESS.Type 
+						|| value == NicoAuthFlagType.NICO_AUTH_FLAG_PREMIUM_SUCCESS.Type)
+			{
+				// ログイン成功
+			}
+			else
+			{
+				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, "status:" + event.status));
 				return;
 			}
 			
