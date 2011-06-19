@@ -173,6 +173,11 @@ package org.mineap.nicovideo4as
 			}
 		}
 		
+		/**
+		 * 
+		 * @param event
+		 * 
+		 */
 		private function timerEventHandler(event:Event):void{
 			login(String(this._loginRequest.data.mail), String(this._loginRequest.data.password), this._url, false);
 		}

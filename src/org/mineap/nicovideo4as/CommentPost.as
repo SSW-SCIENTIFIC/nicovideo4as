@@ -202,12 +202,6 @@ package org.mineap.nicovideo4as
 			getComment.method = "POST";
 			getComment.requestHeaders = new Array(new URLRequestHeader("Content-Type", "text/html"));
 			
-			var premium:String = "0";
-			if (isPremium)
-			{
-				premium = "1";
-			}
-			
 			//<chat thread="" vpos="" mail="184 " ticket="" user_id="" postkey="" premium="">test</chat>
 			var chat:XML = <chat />;
 			chat.@thread = thread;
@@ -216,7 +210,10 @@ package org.mineap.nicovideo4as
 			chat.@ticket = ticket;
 			chat.@user_id = user_id;
 			chat.@postkey = postKey;
-			chat.@premium = premium;
+			if (isPremium)
+			{
+				chat.@premium = "1";
+			}
 			chat.appendChild(comment);
 			
 			getComment.data = chat;

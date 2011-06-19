@@ -233,7 +233,15 @@ package org.mineap.nicovideo4as.analyzer
 				
 				array = IS_PREMIUM_PATTERN.exec(result);
 				if(array != null && array.length > 1){
-					this._isPremium = Boolean(array[array.length-1]);
+					var isPremiumStr:String = array[array.length-1];
+					if (isPremiumStr != null && isPremiumStr == "1")
+					{
+						this._isPremium = true;
+					}
+					else
+					{
+						this._isPremium = false;
+					}
 				}
 				
 				array = NICK_NAME_PATTERN.exec(result);
@@ -248,7 +256,15 @@ package org.mineap.nicovideo4as.analyzer
 				
 				array = DONE_PATTERN.exec(result);
 				if(array != null && array.length > 1){
-					this._done = Boolean(array[array.length-1]);
+					var doneStr:String = array[array.length-1];
+					if (doneStr != null && doneStr.toLowerCase() == "true")
+					{
+						this._done = true;
+					}
+					else
+					{
+						this._done = false;
+					}
 				}
 				
 				array = NEEDS_KEY_PATTERN.exec(result);
