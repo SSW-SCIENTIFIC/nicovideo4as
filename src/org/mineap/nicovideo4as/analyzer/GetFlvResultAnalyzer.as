@@ -1,5 +1,7 @@
 package org.mineap.nicovideo4as.analyzer
 {
+	import flash.net.URLVariables;
+	
 	import org.mineap.nicovideo4as.model.NgUp;
 	import org.mineap.nicovideo4as.util.HtmlUtil;
 
@@ -13,75 +15,74 @@ package org.mineap.nicovideo4as.analyzer
 	{
 		
 		/**
-		 * スレッドIDを抽出するための正規表現です
+		 * スレッドID
 		 */
-		public static const THREAD_ID_PATTERN:RegExp = new RegExp("thread_id=([^&]*)&");
+		public static const THREAD_ID_KEY:String = "thread_id";
 		
 		/**
-		 * 長さを抽出するための正規表現です。
+		 * 長さ
 		 */
-		public static const L_PATTERN:RegExp = new RegExp("&l=([^&]*)&");
+		public static const L_KEY:String = "l";
 		
 		/**
-		 * 動画へのURLを抽出するための正規表現です
+		 * 動画へのURL
 		 */
-		public static const VIDEO_URL_PATTERN:RegExp = new RegExp("&url=([^&]*)&");
+		public static const VIDEO_URL_KEY:String = "url";
 		
 		/**
-		 * 当該動画のSmileVideoへのリンクを抽出するための正規表現です
+		 * 当該動画のSmileVideoへのリンク
 		 */
-		public static const SMILE_VIDEO_LINK_PATTERN:RegExp = new RegExp("&link=([^&]*)&");
+		public static const SMILE_VIDEO_LINK_KEY:String = "link";
 		
 		/**
-		 * メッセージサーバのURLを抽出するための正規表現です。
+		 * メッセージサーバのURL
 		 */
-		public static const MESSAGE_SERVER_URL_PATTERN:RegExp = new RegExp("&ms=([^&]*)&");
+		public static const MESSAGE_SERVER_URL_KEY:String = "ms";
 		
 		/**
-		 * ユーザーIDを抽出するための正規表現です。
+		 * ユーザーID
 		 */
-		public static const USER_ID_PATTERN:RegExp = new RegExp("&user_id=([^&]*)&");
+		public static const USER_ID_KEY:String = "user_id";
 		
 		/**
-		 * プレミアム会員かどうかを抽出するための正規表現です。
+		 * プレミアム会員かどうか
 		 */
-		public static const IS_PREMIUM_PATTERN:RegExp = new RegExp("&is_premium=([^&]*)&");
+		public static const IS_PREMIUM_KEY:String = "is_premium";
 		
 		/**
-		 * ニックネームを抽出するための正規表現です。
+		 * ニックネーム
 		 */
-		public static const NICK_NAME_PATTERN:RegExp = new RegExp("&nickname=([^&]*)&");
+		public static const NICK_NAME_KEY:String = "nickname";
 		
 		/**
-		 * 時刻を抽出するための正規表現です。
+		 * 時刻
 		 */
-		public static const TIME_PATTERN:RegExp = new RegExp("&time=([^&]*)&");
+		public static const TIME_KEY:String = "time";
 		
 		/**
-		 * 
+		 * done
 		 */
-		public static const DONE_PATTERN:RegExp = new RegExp("&done=([^&]*)");
+		public static const DONE_KEY:String = "done";
 		
 		/**
 		 * needs_key
 		 */
-		public static const NEEDS_KEY_PATTERN:RegExp = new RegExp("&needs_key=([^&]*)");
+		public static const NEEDS_KEY_KEY:String = "needs_key";
 		
 		/**
 		 * optional_thread_id
 		 */
-		public static const OPTIONAL_THREAD_ID_PATTERN:RegExp = new RegExp("&optional_thread_id=([^&]*)");
+		public static const OPTIONAL_THREAD_ID_KEY:String = "optional_thread_id";
 		
 		/**
 		 * feedrev
 		 */
-		public static const FEED_REV_PATTERN:RegExp = new RegExp("&feedrev=([^&]*)");
+		public static const FEED_REV_KEY:String = "feedrev";
 		
 		/**
 		 * ng_up
-		 * &ng_up=L=LiSAかわいいよLiSA&Ｌ=だーまえマジ天使
 		 */
-		public static const NG_UP_PATTERN:RegExp = new RegExp("&ng_up=([^&]*)");
+		public static const NG_UP_KEY:String = "ng_up";
 		
 		/**
 		 * エコノミーモード(低画質モード)の検出
@@ -151,6 +152,7 @@ package org.mineap.nicovideo4as.analyzer
 				trace(result);
 				
 				this._result = result;
+				var variables:URLVariables = new URLVariables(result);
 				
 				/*
 				thread_id=1173206704
@@ -198,122 +200,68 @@ package org.mineap.nicovideo4as.analyzer
 						"extra":13}
 				*/
 				
-				var array:Array = THREAD_ID_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._threadId = array[array.length-1];
+				this._threadId = variables[THREAD_ID_KEY];
+				this._l = variables[L_KEY];
+				this._url = variables[VIDEO_URL_KEY];
+				if(this._url.indexOf(LOW_MODE) != -1){
+					this._economyMode = true;
 				}
-				
-				array = L_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._l = Number(array[array.length-1]);
+				this._link = variables[SMILE_VIDEO_LINK_KEY];
+				this._ms = variables[MESSAGE_SERVER_URL_KEY];
+				this._userId = variables[USER_ID_KEY];
+				var isPremiumStr:String = variables[IS_PREMIUM_KEY];
+				if (isPremiumStr != null && (isPremiumStr == "1" || isPremiumStr.toLowerCase() == "true"))
+				{
+					this._isPremium = true;
 				}
-				
-				array = VIDEO_URL_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._url = array[array.length-1];
-					if(this._url.indexOf(LOW_MODE) != -1){
-						this._economyMode = true;
-					}
+				else
+				{
+					this._isPremium = false;
 				}
-				
-				array = SMILE_VIDEO_LINK_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._link = array[array.length-1];
+				this._nickName = variables[NICK_NAME_KEY];
+				this._time = Number(variables[TIME_KEY]);
+				var doneStr:String = variables[DONE_KEY];
+				if (doneStr != null && doneStr.toLowerCase() == "true")
+				{
+					this._done = true;
 				}
-				
-				array = MESSAGE_SERVER_URL_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._ms = array[array.length-1];
+				else
+				{
+					this._done = false;
 				}
+				this._needs_key = int(variables[NEEDS_KEY_KEY]);
+				this._optional_thread_id = variables[OPTIONAL_THREAD_ID_KEY];
+				this._feedrev = variables[FEED_REV_KEY];
 				
-				array = USER_ID_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._userId = array[array.length-1];
-				}
-				
-				array = IS_PREMIUM_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					var isPremiumStr:String = array[array.length-1];
-					if (isPremiumStr != null && isPremiumStr == "1")
-					{
-						this._isPremium = true;
-					}
-					else
-					{
-						this._isPremium = false;
-					}
-				}
-				
-				array = NICK_NAME_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._nickName = array[array.length-1];
-				}
-				
-				array = TIME_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._time = Number(array[array.length-1]);
-				}
-				
-				array = DONE_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					var doneStr:String = array[array.length-1];
-					if (doneStr != null && doneStr.toLowerCase() == "true")
-					{
-						this._done = true;
-					}
-					else
-					{
-						this._done = false;
-					}
-				}
-				
-				array = NEEDS_KEY_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._needs_key = int(array[array.length-1]);
-				}
-				
-				array = OPTIONAL_THREAD_ID_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._optional_thread_id = array[array.length-1];
-				}
-				
-				array = FEED_REV_PATTERN.exec(result);
-				if(array != null && array.length > 1){
-					this._feedrev = array[array.length-1];
-				}
-				
-				array = NG_UP_PATTERN.exec(result);
-				if(array != null && array.length > 1){
+				for(var key:String in variables)
+				{
+					var ngword:String = null;
+					var changedStr:String = null;
 					
-					var pattern:RegExp = new RegExp("&([^&]*)", "g");	//"&ng_up=([^&]*)"
-					
-					while(true){
-						
-						// 結果を格納
-						var str:String = array[array.length-1];
-						var index:int = str.indexOf("=");
-						
-						var ngword:String = str.substring(0, index);
-						var changeValue:String = str.substring(index+1);
-						
-						// &hms=はニコ動の広場を指定するブロック。なのでこの先はスキップ。
-						if(ngword == "hms")
-						{
-							break;
+					if(NG_UP_KEY == key)
+					{
+						ngword = variables[key];
+						// ngword="*はー=はあああああああああああああああああああああああああああああ"
+						var index:int = ngword.indexOf("=");
+						if (index < 0){
+							continue;
 						}
-						
-						this._ng_ups.splice(this._ng_ups.length,0,new NgUp(ngword, changeValue));
-						
-						// 次へ
-						pattern.lastIndex = array.index + str.length;
-						array = pattern.exec(result);
-						
-						if(array == null || array.length <= 1){
-							break;
-						}
+						changedStr = ngword.substr(index+1);
+						ngword = ngword.substring(1, index);
+					}
+					else if(key.charAt(0) == "*")
+					{
+						ngword = key.substr(1);
+						changedStr = variables[key];
+						// key = "*らっちー"
+						// changedStr = "らっち～☆ミ　らっち～☆ミ"
 						
 					}
 					
+					if (ngword != null && changedStr != null)
+					{
+						this._ng_ups.push( new NgUp(ngword, changedStr));
+					}
 				}
 				
 				return true;
