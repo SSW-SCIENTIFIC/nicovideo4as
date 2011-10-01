@@ -57,6 +57,8 @@ package org.mineap.nicovideo4as
 		
 		private var _xml:XML;
 		
+		private var _useOldType:Boolean = false;
+		
 		public static const COMMENT_GET_SUCCESS:String = "CommentGetSuccess";
 		
 		public static const COMMENT_GET_FAIL:String = "CommentGetFail";
@@ -80,13 +82,15 @@ package org.mineap.nicovideo4as
 		 * @param apiAccess getFlvにアクセスするApiGetFlvAccessオブジェクト
 		 * @param when 過去ログを取得する際の取得開始時刻
 		 * @param waybackkey 過去ログを取得する際に必要なwaybackkey
+		 * @param useOldType 通常コメント取得時に古い形式のコメント取得方法を使うかどうか(過去ログ、投稿者コメントでは無効)
 		 */
 		public function getComment(videoId:String, 
 								   count:int, 
 								   isOwnerComment:Boolean, 
 								   apiAccess:ApiGetFlvAccess, 
 								   when:Date = null,
-								   waybackkey:String = null):void
+								   waybackkey:String = null, 
+								   useOldType:Boolean = false):void
 		{
 			this._count = count;
 			
@@ -99,6 +103,8 @@ package org.mineap.nicovideo4as
 			this._when = when;
 			
 			this._waybackkey = waybackkey;
+			
+			this._useOldType = useOldType;
 			
 			var isSucess:Boolean = _getflvAnalyzer.analyze(apiAccess.data);
 			
@@ -141,49 +147,136 @@ package org.mineap.nicovideo4as
 			//var xml:String = "<thread fork=\"1\" user_id=\"" + user_id + "\" res_from=\"1000\" version=\"20061206\" thread=\"" + threadId + "\" />";
 			var xml:XML = null;
 			
+			// 古い形式のコメント取得
 			if(this._getflvAnalyzer.needs_key == 1 && !this._isOwnerComment ){ // 投コメは取りに行かないよ
 				
 				var getThreadKeyResultAnalyzer:GetThreadKeyResultAnalyzer = new GetThreadKeyResultAnalyzer();
 				getThreadKeyResultAnalyzer.analyze((event.currentTarget as ApiGetThreadkeyAccess).data);
 				
-				// 公式 
-				/*
-				  <thread 
-				　thread="******" ← getflv で返ってくる thread_id を使用 
-				　version="20061206" 
-				　res_from="-1000" 
-				　user_id="******" ← getflv で返ってくる user_id を使用 
-				　threadkey="******" ← これ以降の属性は getthreadkey で返ってくる内容 
-				　force_184="1" 
-					　/> 
-				*/
-				xml = new XML("<thread/>");
-				xml.@thread = this._getflvAnalyzer.threadId;
-				xml.@version = "20061206";
-				xml.@res_from = (this._count * -1);
-				xml.@user_id = this._getflvAnalyzer.userId;
+				if (_useOldType)
+				{
+					// 公式動画のコメント
+
+					/*
+					  <thread 
+					　thread="******" ← getflv で返ってくる thread_id を使用 
+					　version="20061206" 
+					　res_from="-1000" 
+					　user_id="******" ← getflv で返ってくる user_id を使用 
+					　threadkey="******" ← これ以降の属性は getthreadkey で返ってくる内容 
+					　force_184="1" 
+						　/> 
+					*/
+					xml = new XML("<thread/>");
+					xml.@thread = this._getflvAnalyzer.threadId;
+					xml.@version = "20061206";
+					xml.@res_from = (this._count * -1);
+					xml.@user_id = this._getflvAnalyzer.userId;
+					
+					for each(var key:String in getThreadKeyResultAnalyzer.getKeys()){
+						xml.@[key] = getThreadKeyResultAnalyzer.getValue(key);
+					}
+					
+					xml = new XML("<packet/>").appendChild(xml);
 				
-				for each(var key:String in getThreadKeyResultAnalyzer.getKeys()){
-					xml.@[key] = getThreadKeyResultAnalyzer.getValue(key);
 				}
+				else
+				{
+					// 公式動画のコメント(新形式)
+					
+					/*
+					<packet>
+						<thread thread="1313044774" version="20090904" user_id="nnn" threadkey="xxx" force_184="n"/>
+						<thread_leaves thread="1313044774" user_id="nnn" threadkey="xxx" force_184="n">0-24:100,1000</thread_leaves>
+					</packet>
+					*/
+					
+					xml = new XML("<packet />");
+					
+					var thread:XML = new XML("<thread />");
+					thread.@thread = this._getflvAnalyzer.threadId;
+					thread.@version = "20090904";
+					thread.@user_id = this._getflvAnalyzer.userId;
+					for each(var key:String in getThreadKeyResultAnalyzer.getKeys()){
+						thread.@[key] = getThreadKeyResultAnalyzer.getValue(key);
+					}
+					
+					var thread_leaves:XML = new XML("<thread_leaves />");
+					thread_leaves.@thread = this._getflvAnalyzer.threadId;
+					thread_leaves.@user_id = this._getflvAnalyzer.userId;
+					for each(var key:String in getThreadKeyResultAnalyzer.getKeys()){
+						thread_leaves.@[key] = getThreadKeyResultAnalyzer.getValue(key);
+					}
+					var l:int = int(this._getflvAnalyzer.l / 60) + 1;
+					thread_leaves.appendChild("0-" + l + ":100");
+					
+					xml.appendChild(thread);
+					xml.appendChild(thread_leaves);
+				}
+				
 				
 			}else{
-				xml = new XML("<thread/>");
-				xml.@res_from = (this._count * -1);
-				if(this._isOwnerComment){
-					xml.@fork = 1;
+				
+				if (_useOldType || this._when != null || this._isOwnerComment)
+				{
+					// 古い形式、もしくは、過去コメント、投稿者コメントを取得したい時
+					
+					// 普通のコメント
+					
+					xml = new XML("<thread/>");
+					xml.@res_from = (this._count * -1);
+					if(this._isOwnerComment){
+						xml.@fork = 1;
+					}
+					xml.@version = "20061206";
+					xml.@thread = this._getflvAnalyzer.threadId;
+					xml.@user_id = this._getflvAnalyzer.userId;
+					if(this._when != null){
+						//unix timeで指定
+						xml.@when = int(this._when.time / 1000);
+					}
+					if(this._waybackkey != null){
+						xml.@waybackkey = this._waybackkey;
+					}
+					
+					xml = new XML("<packet/>").appendChild(xml);
+					
 				}
-				xml.@version = "20061206";
-				xml.@thread = this._getflvAnalyzer.threadId;
-				xml.@user_id = this._getflvAnalyzer.userId;
-				if(this._when != null){
-					//unix timeで指定
-					xml.@when = int(this._when.time / 1000);
-				}
-				if(this._waybackkey != null){
-					xml.@waybackkey = this._waybackkey;
+				else
+				{
+					
+					// 普通のコメント(新形式)
+					
+					/*
+					<packet>
+					<thread thread="1313100893" version="20090904" user_id="nnn"/>
+					<thread_leaves thread="1313100893" user_id="nnn">0-8:100,500</thread_leaves>
+					</packet>
+					*/
+					
+					
+					xml = new XML("<packet />");
+					
+					var thread:XML = new XML("<thread />");
+					thread.@thread = this._getflvAnalyzer.threadId;
+					thread.@version = "20090904";
+					thread.@user_id = this._getflvAnalyzer.userId;
+					
+					var thread_leaves:XML = new XML("<thread_leaves />");
+					thread_leaves.@thread = this._getflvAnalyzer.threadId;
+					thread_leaves.@user_id = this._getflvAnalyzer.userId;
+					
+					var l:int = int(this._getflvAnalyzer.l / 60) + 1;
+					thread_leaves.appendChild("0-" + l + ":100");
+					
+					xml.appendChild(thread);
+					xml.appendChild(thread_leaves);
+					
 				}
 			}
+			
+			trace(xml);
+			
 			getComment.data = xml;
 			
 			this._commentLoader.dataFormat=URLLoaderDataFormat.TEXT;
