@@ -222,6 +222,23 @@ package org.mineap.nicovideo4as
 			var chat:XML = <chat />;
 			chat.@thread = thread;
 			chat.@vpos = String(vpos);
+			if (resutCode != null && resutCode == "1")
+			{
+				// "1"のときは 184 しない
+			}
+			else
+			{
+				if (mail != null && mail.length > 0)
+				{
+					// mailに内容がある
+					mail = "184 " + mail;
+				}
+				else
+				{
+					// mailが空
+					mail = "184"
+				}
+			}
 			chat.@mail = mail;
 			chat.@ticket = ticket;
 			chat.@user_id = user_id;
@@ -236,25 +253,7 @@ package org.mineap.nicovideo4as
 			
 			this._thread = thread;
 			this._vpos = chat.@vpos;
-			
-			if (resutCode != null && resutCode == "1")
-			{
-				// "1"のときは 184 しない
-				this._mail = mail;
-			}
-			else
-			{
-				if (mail != null && mail.length > 0)
-				{
-					// mailに内容がある
-					this._mail = "184 " + mail;
-				}
-				else
-				{
-					// mailが空
-					this._mail = "184"
-				}
-			}
+			this._mail = mail;
 			
 			this._user_id = user_id;
 			this._premium = chat.@premium;
