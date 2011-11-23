@@ -46,6 +46,7 @@ package org.mineap.nicovideo4as
 		private var _ticket:String;
 		private var _mail:String;
 		private var _thread:String;
+		private var _resultCode:String;
 		
 		private var _chat:XML;
 		
@@ -140,7 +141,6 @@ package org.mineap.nicovideo4as
 			this._commentLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatusEventHandler);
 			//TODO コメントローダーにAPIアクセサを渡さないと行けない。
 			this._commentLoader.getComment(videoId, 1, false, apiAccess);
-			
 		}
 		
 		/**
@@ -151,17 +151,22 @@ package org.mineap.nicovideo4as
 		 */
 		private function commentGetSuccess(event:Event):void{
 			var xml:XML = (event.target as CommentLoader).xml;
-			var xmlList:XMLList = xml.thread;
-			var ticket:String = xmlList[0].@ticket;
-			var thread:String = xmlList[0].@thread;
-			var commentCount:int = xmlList[0].@last_res;
-			this._thread = thread;
+			var thread:XML = xml.thread[0];
+			var ticket:String = thread.@ticket;
+			var threadId:String = thread.@thread;
+			var commentCount:int = thread.@last_res;
+			var resultCode:String = thread.@resultcode
+			
+			var comments:XMLList = xml.chat;
+			
+			this._thread = threadId;
 			this._ticket = ticket;
+			this._resultCode = resultCode;
 			
 			var loader:URLLoader = new URLLoader();
 			loader.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
 			loader.addEventListener(Event.COMPLETE, getPostKeySuccess);
-			loader.load(new URLRequest(GETPOSTKEY_URL + "?thread=" + thread + "&block_no=" + int((commentCount+1)/100)));
+			loader.load(new URLRequest(GETPOSTKEY_URL + "?thread=" + threadId + "&block_no=" + int((commentCount+1)/100)));
 		}
 		
 		/**
@@ -171,7 +176,16 @@ package org.mineap.nicovideo4as
 		 */
 		private function getPostKeySuccess(event:Event):void{
 			var postKey:String = (event.target.data as String).substring(event.target.data.indexOf("=")+1);
-			post(postKey, this._commentLoader.userID, this._ticket, this._mail, this._comment, this._vpos, this._thread, this._commentLoader.isPremium, this._commentLoader.messageServerUrl);
+			post(postKey, 
+				this._commentLoader.userID, 
+				this._ticket, 
+				this._mail, 
+				this._comment, 
+				this._vpos, 
+				this._thread, 
+				this._commentLoader.isPremium, 
+				this._commentLoader.messageServerUrl,
+				this._resultCode);
 		}
 		
 		/**
@@ -186,6 +200,7 @@ package org.mineap.nicovideo4as
 		 * @param thread スレッドIDです。コメントXMLから取得します。
 		 * @param isPremium プレミアムかどうかを表すフラグです。1のときにプレミアムです。APIから取得します。
 		 * @param messageServerUrl メッセージサーバーのURLです。コメントXMLから取得します。
+		 * @param resultCode コメントXML内のthread要素に格納されるresutcode属性の値です。
 		 * 
 		 */
 		public function post(postKey:String, 
@@ -196,7 +211,8 @@ package org.mineap.nicovideo4as
 							 vpos:int, 
 							 thread:String, 
 							 isPremium:Boolean, 
-							 messageServerUrl:String):void{
+							 messageServerUrl:String, 
+							 resutCode:String):void{
 			
 			var getComment:URLRequest = new URLRequest(unescape(messageServerUrl));
 			getComment.method = "POST";
@@ -206,7 +222,7 @@ package org.mineap.nicovideo4as
 			var chat:XML = <chat />;
 			chat.@thread = thread;
 			chat.@vpos = String(vpos);
-			chat.@mail = "184 " + mail;
+			chat.@mail = mail;
 			chat.@ticket = ticket;
 			chat.@user_id = user_id;
 			chat.@postkey = postKey;
@@ -220,7 +236,26 @@ package org.mineap.nicovideo4as
 			
 			this._thread = thread;
 			this._vpos = chat.@vpos;
-			this._mail = mail;
+			
+			if (resutCode != null && resutCode == "1")
+			{
+				// "1"のときは 184 しない
+				this._mail = mail;
+			}
+			else
+			{
+				if (mail != null && mail.length > 0)
+				{
+					// mailに内容がある
+					this._mail = "184 " + mail;
+				}
+				else
+				{
+					// mailが空
+					this._mail = "184"
+				}
+			}
+			
 			this._user_id = user_id;
 			this._premium = chat.@premium;
 			this._comment = comment;
