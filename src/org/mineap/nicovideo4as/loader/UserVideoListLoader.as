@@ -30,13 +30,18 @@ package org.mineap.nicovideo4as.loader
 		/**
 		 * 
 		 * @param userId
+		 * @param page 
 		 * 
 		 */
-		public function getVideoList(userId:String):void
+		public function getVideoList(userId:String, page:int = 0):void
 		{
 			var url:String = USER_VIDEO_LIST_URL_PRE + userId + USER_VIDEO_LIST_URL_SUF;
 			
 			var variables:URLVariables = new URLVariables();
+			if (page > 0)
+			{
+				variables.page = page;
+			}
 			variables.rss = "2.0";
 			
 			var request:URLRequest = new URLRequest(url);
