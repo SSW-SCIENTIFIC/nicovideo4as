@@ -47,10 +47,21 @@ package org.mineap.nicovideo4as.loader
 								   pageCount:int = 1, 
 								   category:String = "all"):void{
 			
-			var request:URLRequest = new URLRequest(NicoRankingUrl.NICO_RANKING_URLS[period][target] + category);
+			var request:URLRequest;
+			if (period == 5)
+			{
+				request = new URLRequest(NicoRankingUrl.NICO_RANKING_URLS[period][0]);
+			}
+			else
+			{
+				request = new URLRequest(NicoRankingUrl.NICO_RANKING_URLS[period][target] + category);
+			}
 			
 			var variables:URLVariables = new URLVariables();
-			variables.page = pageCount;
+			if (pageCount > 1)
+			{
+				variables.page = pageCount;
+			}
 			variables.rss = "2.0";
 			
 			request.data = variables;
