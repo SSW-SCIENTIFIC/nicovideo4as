@@ -111,6 +111,11 @@ package org.mineap.nicovideo4as
 		
 		/**
 		 * 
+		 */
+		private var _jsonObj:Object = null;
+		
+		/**
+		 * 
 		 * 
 		 */
 		public function WatchVideoPage()
@@ -154,6 +159,16 @@ package org.mineap.nicovideo4as
 		 */
 		public function getVideoId():String{
 			
+			// json形式でとれた場合はそれで返す (zero対応)
+			if (this._jsonObj != null)
+			{
+				var description:String = this._jsonObj.videoDetail.description;
+				if (description != null)
+				{
+					return description;
+				}
+			}
+			
 			if(this._watchLoader.data != null){
 				
 				var result:Array = videoIdPattern.exec(this._watchLoader.data);
@@ -175,6 +190,16 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getDescription():String{
+			
+			// json形式でとれた場合はそれで返す (zero対応)
+			if (this._jsonObj != null)
+			{
+				var description:String = this._jsonObj.videoDetail.description;
+				if (description != null)
+				{
+					return HtmlUtil.convertCharacterCodeToCharacter(description);
+				}
+			}
 			
 			if (this._watchLoader.data != null) {
 				
@@ -272,6 +297,12 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getChannel():String{
+			
+			if (this._jsonObj != null)
+			{
+				return this._jsonObj.videoDetail.cannelId;
+			}
+			
 			if (this._watchLoader != null && this._watchLoader.data != null)
 			{
 				var channelPattern:RegExp = new RegExp(channel);
@@ -290,6 +321,16 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getChannelIconUrl():String{
+			
+			if (this._jsonObj != null)
+			{
+				var channelId:String = getChannel();
+				if (channelId != null)
+				{
+					return "http://icon.nimg.jp/channel/" + channelId + ".jpg";
+				}
+			}
+			
 			if (this._watchLoader != null && this._watchLoader.data != null)
 			{
 				var channelPattern:RegExp = new RegExp(channel);
@@ -327,6 +368,11 @@ package org.mineap.nicovideo4as
 		 */
 		public function checkHarmful():Boolean
 		{
+			if (this._jsonObj != null)
+			{
+				return this._jsonObj.videoDetail.isR18;
+			}
+			
 			if (this._watchLoader != null && this._watchLoader.data != null)
 			{
 				var str:String = getVideoId() + "?" + harmful;
@@ -341,6 +387,21 @@ package org.mineap.nicovideo4as
 		
 		/**
 		 * 
+		 * @return 
+		 * 
+		 */
+		public function get audioDownloadUrl():String
+		{
+			if (this._jsonObj != null)
+			{
+				return this._jsonObj.videoDetail.audioDownloadUrl;
+			}
+			return null;
+		}
+		
+		
+		/**
+		 * 
 		 * @param event
 		 * 
 		 */
@@ -348,9 +409,41 @@ package org.mineap.nicovideo4as
 			
 			// TODO テスト
 //			trace(this.getDescription());
-			
 			this._data = this._watchLoader.data;
+			
+			// 可能であればjsonオブジェクトを作る
+			this._jsonObj = createJsonObject(String(this._data));
+			
 			dispatchEvent(new Event(WATCH_SUCCESS));
+		}
+		
+		/**
+		 * 
+		 * @param str
+		 * @return 
+		 * 
+		 */
+		private function createJsonObject(str:String):Object
+		{
+			if (str == null)
+			{
+				return null;
+			}
+			
+			var jsonObj:Object = null;
+			
+			var regexp:RegExp = new RegExp("<div id=\"watchAPIDataContainer\" style=\"display:none\">(.+?)</div>");
+			
+			var obj:Object = regexp.exec(str);
+			
+			if (obj[1] != null)
+			{
+				var jsonStr:String = obj[1];
+				jsonObj = JSON.parse(jsonStr);
+			}
+			
+			return jsonObj;
+			
 		}
 		
 		/**
@@ -360,6 +453,16 @@ package org.mineap.nicovideo4as
 		 */
 		public function get data():Object{
 			return this._data;
+		}
+		
+		/**
+		 * 
+		 * @return 
+		 * 
+		 */
+		public function get jsonData():Object
+		{
+			return this._jsonObj;
 		}
 		
 		/**
