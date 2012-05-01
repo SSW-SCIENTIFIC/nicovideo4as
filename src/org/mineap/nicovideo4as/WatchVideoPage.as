@@ -439,7 +439,7 @@ package org.mineap.nicovideo4as
 			if (obj[1] != null)
 			{
 				var jsonStr:String = obj[1];
-				jsonObj = JSON.parse(jsonStr);
+				jsonObj = JSON.parse(HtmlUtil.convertSpecialCharacterNotIncludedString(jsonStr));
 			}
 			
 			return jsonObj;
