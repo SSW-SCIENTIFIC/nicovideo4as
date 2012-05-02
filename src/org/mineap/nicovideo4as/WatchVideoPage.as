@@ -474,7 +474,7 @@ package org.mineap.nicovideo4as
 			
 			var obj:Object = regexp.exec(str);
 			
-			if (obj[1] != null)
+			if (obj != null && obj[1] != null)
 			{
 				var jsonStr:String = obj[1];
 				jsonObj = JSON.parse(HtmlUtil.convertSpecialCharacterNotIncludedString(jsonStr));
