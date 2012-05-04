@@ -47,6 +47,7 @@ package org.mineap.nicovideo4as
 		private var _mail:String;
 		private var _thread:String;
 		private var _resultCode:String;
+		private var _is184:Boolean;
 		
 		private var _chat:XML;
 		
@@ -77,20 +78,22 @@ package org.mineap.nicovideo4as
 		 * @param comment 投稿するコメント
 		 * @param mail コメントのコマンド
 		 * @param vpos 動画を投稿するvpos
+		 * @param is184 匿名でコメントするかどうか
 		 * @author edvakf
 		 */
-		public function postCommentWithLogin(
-			mailAddress:String,
-			password:String,
-			videoId:String, 
-			comment:String, 
-			mail:String, 
-			vpos:int):void{
+		public function postCommentWithLogin(mailAddress:String,
+											 password:String,
+											 videoId:String, 
+											 comment:String, 
+											 mail:String, 
+											 vpos:int,
+											 is184:Boolean):void{
 			
 			this._videoId = videoId;
 			this._comment = comment;
 			this._mail = mail;
 			this._vpos = vpos;
+			this._is184 = is184;
 			
 			this._login.addEventListener(Login.LOGIN_SUCCESS, loginSuccessHandler);
 			this._login.addEventListener(Login.LOGIN_FAIL, networkErrorHandler);
@@ -113,7 +116,7 @@ package org.mineap.nicovideo4as
 		 * @author edvakf
 		 */
 		protected function getflvLoadedHandler(event:Event):void{
-			this.postComment(this._videoId, this._mail, this._comment, this._vpos, this._getflvAccess);
+			this.postComment(this._videoId, this._mail, this._comment, this._vpos, this._getflvAccess, this._is184);
 		}
 		
 		/**
@@ -123,6 +126,7 @@ package org.mineap.nicovideo4as
 		 * @param mail コメントのコマンド
 		 * @param comment 投稿するコメント
 		 * @param vpos 動画を投稿するvpos
+		 * @param is184 匿名でコメントするかどうか
 		 * @return 
 		 * 
 		 */
@@ -130,11 +134,13 @@ package org.mineap.nicovideo4as
 									mail:String, 
 									comment:String, 
 									vpos:int, 
-									apiAccess:ApiGetFlvAccess):void{
+									apiAccess:ApiGetFlvAccess,
+									is184:Boolean):void{
 			
 			this._comment = comment;
 			this._mail = mail;
 			this._vpos = vpos;
+			this._is184 = is184;
 			
 			this._commentLoader.addEventListener(CommentLoader.COMMENT_GET_SUCCESS, commentGetSuccess);
 			this._commentLoader.addEventListener(CommentLoader.COMMENT_GET_FAIL, networkErrorHandler);
@@ -185,7 +191,8 @@ package org.mineap.nicovideo4as
 				this._thread, 
 				this._commentLoader.isPremium, 
 				this._commentLoader.messageServerUrl,
-				this._resultCode);
+				this._resultCode, 
+				this._is184);
 		}
 		
 		/**
@@ -212,7 +219,8 @@ package org.mineap.nicovideo4as
 							 thread:String, 
 							 isPremium:Boolean, 
 							 messageServerUrl:String, 
-							 resutCode:String):void{
+							 resutCode:String, 
+							 is184:Boolean):void{
 			
 			var getComment:URLRequest = new URLRequest(unescape(messageServerUrl));
 			getComment.method = "POST";
@@ -222,21 +230,32 @@ package org.mineap.nicovideo4as
 			var chat:XML = <chat />;
 			chat.@thread = thread;
 			chat.@vpos = String(vpos);
+			
+			if (mail == null)
+			{
+				mail = "";
+			}
+			
 			if (resutCode != null && resutCode == "1")
 			{
 				// "1"のときは 184 しない
 			}
 			else
 			{
-				if (mail != null && mail.length > 0)
+				if (is184 && mail.indexOf("184") != -1)
 				{
-					// mailに内容がある
-					mail = "184 " + mail;
-				}
-				else
-				{
-					// mailが空
-					mail = "184"
+					
+					if (mail.length > 0)
+					{
+						// mailに内容がある
+						mail = "184 " + mail;
+					}
+					else
+					{
+						// mailが空
+						mail = "184";
+					}
+				
 				}
 			}
 			chat.@mail = mail;
