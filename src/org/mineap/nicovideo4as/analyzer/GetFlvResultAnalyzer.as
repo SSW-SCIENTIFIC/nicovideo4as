@@ -203,7 +203,7 @@ package org.mineap.nicovideo4as.analyzer
 				this._threadId = variables[THREAD_ID_KEY];
 				this._l = variables[L_KEY];
 				this._url = variables[VIDEO_URL_KEY];
-				if(this._url.indexOf(LOW_MODE) != -1){
+				if(url != null && this._url.indexOf(LOW_MODE) != -1){
 					this._economyMode = true;
 				}
 				this._link = variables[SMILE_VIDEO_LINK_KEY];
