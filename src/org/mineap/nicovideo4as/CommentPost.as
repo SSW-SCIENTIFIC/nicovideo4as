@@ -36,6 +36,7 @@ package org.mineap.nicovideo4as
 		private var _postLoader:URLLoader;
 		private var _login:Login;
 		private var _getflvAccess:ApiGetFlvAccess;
+		private var _watchLoader:WatchVideoPage;
 		
 		private var _videoId:String;
 		private var _comment:String;
@@ -48,6 +49,8 @@ package org.mineap.nicovideo4as
 		private var _thread:String;
 		private var _resultCode:String;
 		private var _is184:Boolean;
+		private var _isRedirected:Boolean = false;
+		private var _redirectedVideoId:String;
 		
 		private var _chat:XML;
 		
@@ -66,6 +69,7 @@ package org.mineap.nicovideo4as
 			this._postLoader = new URLLoader();
 			this._login = new Login();
 			this._getflvAccess = new ApiGetFlvAccess();
+			this._watchLoader = new WatchVideoPage();
 			this._chat = null;
 		}
 		
@@ -102,13 +106,56 @@ package org.mineap.nicovideo4as
 		
 		/**
 		 * ログイン完了後に呼ばれます。
-		 * @author edvakf
 		 */
-		protected function loginSuccessHandler(event:Event):void{
+		protected function loginSuccessHandler(event:Event):void
+		{
+			this._watchLoader.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
+			this._watchLoader.addEventListener(Event.COMPLETE, getflvSuccessHandler);
+			this._watchLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, function(event:HTTPStatusEvent):void{
+				trace(event);
+				
+				var url:String = event.responseURL;
+				var index:int = url.lastIndexOf("/");
+				var threadId:String = url.substr(index + 1);
+				
+				index = threadId.indexOf("?");
+				if (index != -1)
+				{
+					threadId = threadId.substring(0, index);
+				}
+				
+				// リダイレクトされた。
+				if(threadId != _videoId){
+					trace("リダイレクト: " + _videoId + " -> " + threadId);
+					_isRedirected = true;
+					_redirectedVideoId = threadId;
+				}
+					
+				httpResponseStatusEventHandler(event);
+			});
+			// チャンネル動画はリダイレクト先のURLに含まれる動画IDを使う必要があるので、リダイレクトがあるかどうかチェック。
+			this._watchLoader.watchVideo(this._videoId, true);
+		}
+		
+		/**
+		 * 動画ページを見に行った後に呼ばれます
+		 * 
+		 */
+		protected function getflvSuccessHandler(event:Event):void
+		{
 			this._getflvAccess.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
 			this._getflvAccess.addEventListener(Event.COMPLETE, getflvLoadedHandler);
 			// alwaysEconomy フラグを false にしていますが、動画 URL を取得するわけではないので関係ないはず。
-			this._getflvAccess.getAPIResult(this._videoId, false);
+			
+			if (_isRedirected)
+			{
+				// チャンネル動画
+				this._getflvAccess.getAPIResult(this._redirectedVideoId, false);
+			}
+			else
+			{
+				this._getflvAccess.getAPIResult(this._videoId, false);
+			}
 		}
 		
 		/**
