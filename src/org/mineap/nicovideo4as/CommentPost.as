@@ -110,7 +110,8 @@ package org.mineap.nicovideo4as
 		protected function loginSuccessHandler(event:Event):void
 		{
 			this._watchLoader.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
-			this._watchLoader.addEventListener(Event.COMPLETE, getflvSuccessHandler);
+			this._watchLoader.addEventListener(WatchVideoPage.WATCH_FAIL, networkErrorHandler);
+			this._watchLoader.addEventListener(WatchVideoPage.WATCH_SUCCESS, getflvSuccessHandler);
 			this._watchLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, function(event:HTTPStatusEvent):void{
 				trace(event);
 				
@@ -144,6 +145,7 @@ package org.mineap.nicovideo4as
 		protected function getflvSuccessHandler(event:Event):void
 		{
 			this._getflvAccess.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
+			this._getflvAccess.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatusEventHandler);
 			this._getflvAccess.addEventListener(Event.COMPLETE, getflvLoadedHandler);
 			// alwaysEconomy フラグを false にしていますが、動画 URL を取得するわけではないので関係ないはず。
 			
