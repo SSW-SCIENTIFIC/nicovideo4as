@@ -42,6 +42,19 @@ package org.mineap.nicovideo4as.stream
 		}
 		
 		/**
+		 * 指定されたURLリクエストを使って動画をロードします。
+		 * 
+		 * @param request
+		 * @see URLStream#load(URLRequest)
+		 */
+		public function getVideoStartByRequest(request:URLRequest):void
+		{
+			this._videoType = checkVideoType(request.url);
+			
+			super.load(request);
+		}
+		
+		/**
 		 * 
 		 * @param url
 		 * @return 
