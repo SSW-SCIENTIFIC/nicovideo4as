@@ -117,7 +117,6 @@ package org.mineap.nicovideo4as.analyzer
 				}
 			}catch(error:Error){
 				trace(error.getStackTrace());
-				this._logManager.addLog("タグ情報の取得に失敗:" + error + error.getStackTrace());
 				this._tagArray = new Array();
 				this._tagArray.push("(タグ情報の取得に失敗)");
 			}
