@@ -89,6 +89,12 @@ package org.mineap.nicovideo4as.analyzer
 		 */
 		public static const LOW_MODE:String = "low";
 		
+		
+		/**
+		 * FMSに接続するためのトークン
+		 */
+		public static const FMS_TOKEN:String = "fmst";
+		
 		private var _threadId:String = null;
 		
 		private var _l:Number = 0;
@@ -120,6 +126,8 @@ package org.mineap.nicovideo4as.analyzer
 		private var _economyMode:Boolean = false;
 		
 		private var _result:String = null;
+		
+		private var _fmsToken:String = null;
 		
 		/**
 		 * コンストラクタ
@@ -264,6 +272,8 @@ package org.mineap.nicovideo4as.analyzer
 					}
 				}
 				
+				this._fmsToken = variables[FMS_TOKEN];
+				
 				return true;
 				
 			}catch(error:Error){
@@ -350,6 +360,11 @@ package org.mineap.nicovideo4as.analyzer
 		public function get economyMode():Boolean
 		{
 			return _economyMode;
+		}
+		
+		public function get fmsToken():String
+		{
+			return _fmsToken;
 		}
 
 
