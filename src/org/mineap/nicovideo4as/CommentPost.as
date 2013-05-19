@@ -291,20 +291,21 @@ package org.mineap.nicovideo4as
 			}
 			else
 			{
-				if (is184 && mail.indexOf("184") != -1)
+				if (is184)
 				{
-					
-					if (mail.length > 0)
+					if (mail.indexOf("184") == -1)
 					{
-						// mailに内容がある
-						mail = "184 " + mail;
+						if (mail.length > 0)
+						{
+							// mailに内容がある
+							mail = "184 " + mail;
+						}
+						else
+						{
+							// mailが空
+							mail = "184";
+						}
 					}
-					else
-					{
-						// mailが空
-						mail = "184";
-					}
-				
 				}
 			}
 			chat.@mail = mail;
@@ -355,6 +356,7 @@ package org.mineap.nicovideo4as
 			trace(event);
 			try{
 				var resXml:XML = new XML((event.target as URLLoader).data);
+				trace(resXml);
 				if (resXml.chat_result.@status != "0")
 				{
 					throw new Error("コメントの投稿に失敗:chat_result.@status=" + resXml.chat_result.@status);
