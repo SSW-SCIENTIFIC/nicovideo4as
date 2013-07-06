@@ -359,7 +359,14 @@ package org.mineap.nicovideo4as
 				trace(resXml);
 				if (resXml.chat_result.@status != "0")
 				{
-					throw new Error("コメントの投稿に失敗:chat_result.@status=" + resXml.chat_result.@status);
+					if (resXml.chat_result.@status == "1")
+					{
+						throw new Error("同じ内容のコメントを二回連続で投稿できません(status=" + resXml.chat_result.@status + ")");
+					}
+					else
+					{
+						throw new Error("コメントの投稿に失敗:chat_result.@status=" + resXml.chat_result.@status);	
+					}
 				}
 				
 				if (resXml.chat_result.@no != null)
@@ -372,7 +379,8 @@ package org.mineap.nicovideo4as
 				}
 			}catch(error:Error){
 				trace(error.getStackTrace());
-				dispatchEvent(new IOErrorEvent(COMMENT_POST_FAIL, false, false, error.toString()));
+				var ioError:IOErrorEvent = new IOErrorEvent(COMMENT_POST_FAIL, false, false, error.toString());
+				dispatchEvent(ioError);
 				return;
 			}
 			dispatchEvent(new Event(COMMENT_POST_SUCCESS));
