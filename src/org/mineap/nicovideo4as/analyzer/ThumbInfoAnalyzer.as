@@ -17,6 +17,7 @@ package org.mineap.nicovideo4as.analyzer
 		private var _status:String;
 		private var _length:String;
 		private var _errorCode:String;
+		private var _thumbnailUrl:String;
 		
 		public static const STATUS_OK:String = "ok";
 		
@@ -85,6 +86,7 @@ package org.mineap.nicovideo4as.analyzer
 					this._firstRetrieve = xml.thumb.first_retrieve;
 					this._lastResBody = HtmlUtil.convertSpecialCharacterNotIncludedString(xml.thumb.last_res_body.text());
 					this._length = xml.thumb.length;
+					this._thumbnailUrl = xml.thumb.thumbnail_url;
 					
 					var tags:XMLList = xml.thumb.tags;
 					for(var i:int=0; i<tags.tag.length(); i++){
@@ -269,7 +271,13 @@ package org.mineap.nicovideo4as.analyzer
 			return _videoId;
 		}
 
-
+		/**
+		 * @return 
+		 */
+		public function get thumbnailUrl():String
+		{
+			return _thumbnailUrl;
+		}
 
 	}
 }
