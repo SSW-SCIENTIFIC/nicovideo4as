@@ -3,8 +3,6 @@ package org.mineap.nicovideo4as.loader.api
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLVariables;
-	
-	import mx.messaging.SubscriptionInfo;
 
 	/**
 	 * 

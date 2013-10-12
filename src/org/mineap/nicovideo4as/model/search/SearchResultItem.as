@@ -1,4 +1,4 @@
-package org.mineap.nicovideo4as.model
+package org.mineap.nicovideo4as.model.search
 {
 	/**
 	 * 検索によって取得された、１動画の情報を表現します
@@ -20,9 +20,14 @@ package org.mineap.nicovideo4as.model
 		public var contribute:String;
 		
 		/**
-		 * 動画のurl
+		 * 動画のID
 		 */
-		public var url:String;
+		public var videoId:String;
+		
+		/**
+		 * サムネイル画像のURL
+		 */
+		public var thumbImgUrl:String;
 		
 		/**
 		 * 再生回数
@@ -46,8 +51,14 @@ package org.mineap.nicovideo4as.model
 		
 		/**
 		 * 
+		 */
+		public var lastResBody:String;
+		
+		/**
+		 * 
 		 * @param title 動画のタイトル
-		 * @param url 動画のurl
+		 * @param videoId 動画のID
+		 * @param tumbImgUrl サムネイル画像のURL
 		 * @param contribute 投稿日時
 		 * @param playCount 再生回数
 		 * @param myListCount マイリスト数
@@ -55,15 +66,17 @@ package org.mineap.nicovideo4as.model
 		 * @param videoLength 動画の長さ
 		 * 
 		 */
-		public function SearchResultItem(title:String, url:String, contribute:String = null, playCount:int = 0, myListCount:int = 0, commentCount:int = 0, videoLength:String = null)
+		public function SearchResultItem(title:String, videoId:String, thumbImgUrl:String, contribute:String = null, playCount:int = 0, myListCount:int = 0, commentCount:int = 0, videoLength:String = null, lastResBody:String = "")
 		{
 			this.title = title;
-			this.url = url;
+			this.videoId = videoId;
+			this.thumbImgUrl = thumbImgUrl
 			this.contribute = contribute;
 			this.playCount = playCount;
 			this.myListCount = myListCount;
 			this.commentCount = commentCount;
 			this.videoLength = videoLength;
+			this.lastResBody = lastResBody;
 		}
 	}
 }

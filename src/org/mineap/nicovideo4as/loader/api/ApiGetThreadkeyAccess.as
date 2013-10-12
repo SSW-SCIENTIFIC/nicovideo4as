@@ -7,7 +7,7 @@ package org.mineap.nicovideo4as.loader.api
 	public class ApiGetThreadkeyAccess extends URLLoader
 	{
 		
-		public static const GET_THREADKEY_API_URL:String = "http://flapi.nicovideo.jp/api/getthreadkey";
+		public static const GET_THREADKEY_API_URL:String = "http://ext.nicovideo.jp/api/getthreadkey";
 		
 		private var _url:String = GET_THREADKEY_API_URL;
 		
