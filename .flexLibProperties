@@ -4,6 +4,8 @@
     <classEntry path="org.mineap.nicovideo4as.loader.ChannelLoader"/>
     <classEntry path="org.mineap.nicovideo4as.UserAgentManager"/>
     <classEntry path="org.mineap.nicovideo4as.loader.UserVideoListLoader"/>
+    <classEntry path="org.mineap.nicovideo4as.loader.api.ApiSearchAccess"/>
+    <classEntry path="org.mineap.nicovideo4as.model.search.SearchOrderType"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
