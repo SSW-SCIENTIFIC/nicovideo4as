@@ -92,13 +92,30 @@ package org.mineap.nicovideo4as
 		 */
 		private function completeHandler(event:Event):void{
 			var result:String = String((event.currentTarget as URLLoader).data);
+			var jsonObj:Object = JSON.parse(result);
+			
+			var status:String = jsonObj["status"];
+			var errorCode:String = null;
+			
+			if (status == "fail") {
+				var errorObj:Object = jsonObj["error"];
+				errorCode = errorObj["code"];
+					
+			}
+			
 			trace(result);
-			if(result.indexOf("ok") != -1){
+			if(status == "ok"){
 				dispatchEvent(new Event(MyListAdder.SUCCESS, false, false));
-			}else if(result.indexOf("\"code\":\"EXIST\"") != -1){
-				dispatchEvent(new Event(MyListAdder.DUP_ERROR, false, false));
-			}else if(result.indexOf("\"code\":\"NONEXIST\"") != -1){
-				dispatchEvent(new Event(MyListAdder.NOTEXIST, false, false));
+			}else if ( status == "fail" ) {
+				if (errorCode == "EXIST") {
+					dispatchEvent(new Event(MyListAdder.DUP_ERROR, false, false));
+				}else if(errorCode == "NONEXIST"){
+					dispatchEvent(new Event(MyListAdder.NOTEXIST, false, false));
+				}else if(errorCode == "INVALIDTOKEN"){
+					dispatchEvent(new ErrorEvent(MyListAdder.FAIL, false, false, errorCode));
+				}else {
+					dispatchEvent(new ErrorEvent(MyListAdder.FAIL, false, false, "errorCode=" + errorCode));
+				}
 			}else{
 				dispatchEvent(new ErrorEvent(MyListAdder.FAIL, false, false, event.toString()));
 			}

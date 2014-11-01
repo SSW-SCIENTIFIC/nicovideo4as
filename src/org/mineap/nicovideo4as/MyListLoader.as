@@ -21,7 +21,7 @@ package org.mineap.nicovideo4as
 	{
 		
 		//<input type="hidden" name="csrf_token" value="66a938cdec2c49fbd87ff2a9ebf09a81f8c932c0">
-		private static const tokenPattern:RegExp = new RegExp("NicoAPI.token = \"(.+)\";");
+		private static const tokenPattern:RegExp = new RegExp("NicoAPI.token = '(.+)';");
 		
 		//<option value="434361">おきに</option>
 		private static const myListPattern:RegExp = new RegExp("<option value=\"(\\d+)\"[^>]*>([^<]+)</option>", "ig");
