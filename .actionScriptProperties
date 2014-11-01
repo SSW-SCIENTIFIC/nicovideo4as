@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <actionScriptProperties analytics="false" mainApplicationPath="nicovideo4as.as" projectUUID="26d26d44-42b8-47b3-977d-05718ba28f35" version="11">
-  <compiler additionalCompilerArguments="-locale ja_JP" autoRSLOrdering="true" copyDependentFiles="false" flexSDK="Apache Flex 4.10.0 FP 11.8 AIR 3.8 en_US" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="true" useDebugRSLSwfs="true" useFlashSDK="false" verifyDigests="true" warn="true">
+  <compiler additionalCompilerArguments="-locale ja_JP" autoRSLOrdering="true" copyDependentFiles="false" flexSDK="Apache Flex 4.13.0 FP14.0 AIR14.0 en_US" fteInMXComponents="false" generateAccessible="true" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="false" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="true" useDebugRSLSwfs="true" useFlashSDK="false" verifyDigests="true" warn="true">
     <compilerSourcePath/>
     <libraryPath defaultLinkType="0">
       <libraryPathEntry kind="4" path="">
