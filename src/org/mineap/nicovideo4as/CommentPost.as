@@ -221,7 +221,7 @@ package org.mineap.nicovideo4as
 			var loader:URLLoader = new URLLoader();
 			loader.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
 			loader.addEventListener(Event.COMPLETE, getPostKeySuccess);
-			loader.load(new URLRequest(GETPOSTKEY_URL + "?thread=" + threadId + "&block_no=" + int((commentCount+1)/100)));
+			loader.load(new URLRequest(GETPOSTKEY_URL + "?version=1&yugi=&device=1&version_sub=2&thread=" + threadId + "&block_no=" + int((commentCount+1)/100)));
 		}
 		
 		/**
@@ -257,6 +257,7 @@ package org.mineap.nicovideo4as
 		 * @param isPremium プレミアムかどうかを表すフラグです。1のときにプレミアムです。APIから取得します。
 		 * @param messageServerUrl メッセージサーバーのURLです。コメントXMLから取得します。
 		 * @param resultCode コメントXML内のthread要素に格納されるresutcode属性の値です。
+		 * @param is184 匿名でコメントするかどうかを指定します。
 		 * 
 		 */
 		public function post(postKey:String, 
@@ -268,7 +269,7 @@ package org.mineap.nicovideo4as
 							 thread:String, 
 							 isPremium:Boolean, 
 							 messageServerUrl:String, 
-							 resutCode:String, 
+							 resultCode:String,
 							 is184:Boolean):void{
 			
 			var getComment:URLRequest = new URLRequest(unescape(messageServerUrl));
@@ -285,7 +286,7 @@ package org.mineap.nicovideo4as
 				mail = "";
 			}
 			
-			if (resutCode != null && resutCode == "1")
+			if (resultCode != null && resultCode == "1")
 			{
 				// "1"のときは 184 しない
 			}
