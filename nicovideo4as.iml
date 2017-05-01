@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="Flex" version="4">
+  <component name="FlexBuildConfigurationManager" active="nicovideo4as">
+    <configurations>
+      <configuration name="nicovideo4as" target-platform="Desktop" output-type="Library" output-file="nicovideo4as.swc" output-folder="$MODULE_DIR$/bin">
+        <dependencies>
+          <sdk name="AIRSDK_Compiler" />
+        </dependencies>
+        <compiler-options>
+          <map>
+            <entry key="compiler.locale" value="ja_JP" />
+          </map>
+        </compiler-options>
+        <packaging-air-desktop />
+        <packaging-android />
+        <packaging-ios />
+      </configuration>
+    </configurations>
+    <compiler-options />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="AIRSDK_Compiler" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

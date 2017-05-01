@@ -7,9 +7,15 @@ package org.mineap.nicovideo4as
 	import flash.net.URLLoader;
 	import flash.net.URLLoaderDataFormat;
 	import flash.net.URLRequest;
-	
-	import org.mineap.nicovideo4as.analyzer.GetFlvResultAnalyzer;
-	import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
+import flash.utils.clearInterval;
+import flash.utils.setInterval;
+
+import org.mineap.nicovideo4as.analyzer.DmcInfoAnalyzer;
+import org.mineap.nicovideo4as.analyzer.DmcResultAnalyzer;
+
+import org.mineap.nicovideo4as.analyzer.GetFlvResultAnalyzer;
+import org.mineap.nicovideo4as.loader.api.ApiDmcAccess;
+import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
 	import org.mineap.nicovideo4as.model.VideoType;
 	
 	/**
@@ -24,9 +30,15 @@ package org.mineap.nicovideo4as
 		
 		private var _videoLoader:URLLoader;
 		
-		private var _apiAccess:ApiGetFlvAccess;
+		private var _apiGetFlvAccess:ApiGetFlvAccess;
+
+		private var _apiDmcAccess: ApiDmcAccess;
 		
-		private var _analyzer:GetFlvResultAnalyzer;
+		private var _getFlvAnalyzer:GetFlvResultAnalyzer;
+
+		private var _dmcInfoAnalyzer: DmcInfoAnalyzer;
+
+		private var _dmcResultAnalyzer: DmcResultAnalyzer;
 		
 		private var _videoType:VideoType;
 		
@@ -45,7 +57,6 @@ package org.mineap.nicovideo4as
 		public function VideoLoader()
 		{
 			this._videoLoader = new URLLoader();
-			this._apiAccess = new ApiGetFlvAccess();
 		}
 		
 		/**
@@ -54,11 +65,17 @@ package org.mineap.nicovideo4as
 		 * @param isStreamingPlay ストリーミング再生かどうかです。
 		 * 	trueに設定すると、URL取得完了時にEvent(VIDEO_URL_GET_SUCCESS)が発行され、その後ダウンロード処理を行いません。
 		 * @param getflvAccess
+		 * @param dmcAccess
 		 */
-		public function getVideo(isStreamingPlay:Boolean, getflvAccess:ApiGetFlvAccess):void{
+		public function getVideo(
+				isStreamingPlay:Boolean,
+				getflvAccess:ApiGetFlvAccess,
+				dmcAccess: ApiDmcAccess = null
+		):void{
 			
 			this._isStreamingPlay = isStreamingPlay;
-			this._apiAccess = getflvAccess;
+			this._apiGetFlvAccess = getflvAccess;
+			this._apiDmcAccess = dmcAccess;
 			
 			this._getVideo();
 		}
@@ -96,15 +113,22 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		private function _getVideo():void{
-//			trace(unescape(decodeURIComponent(_apiAccess.data)));
+//			trace(unescape(decodeURIComponent(_apiGetFlvAccess.data)));
 			
-			this._analyzer = new GetFlvResultAnalyzer();
-			this._analyzer.analyze(this._apiAccess.data);
+			this._getFlvAnalyzer = new GetFlvResultAnalyzer();
+			this._dmcInfoAnalyzer = new DmcInfoAnalyzer();
+			this._dmcResultAnalyzer = new DmcResultAnalyzer();
+
+			if (this._apiDmcAccess != null) {
+                this._dmcResultAnalyzer.analyze(this._apiDmcAccess.data);
+            }
+
+			this._getFlvAnalyzer.analyze(this._apiGetFlvAccess.data);
 			
-			this._videoUrl = this._analyzer.url;
+			this._videoUrl = this._dmcResultAnalyzer.isValid ? this._dmcResultAnalyzer.contentUri : this._getFlvAnalyzer.url;
 			
 			if(this._videoUrl != null){
-				if(this._videoUrl.indexOf("smile?m=")!=-1){
+				if(this._videoUrl.indexOf("smile?m=")!=-1 || this._apiDmcAccess != null){
 					this._videoType = VideoType.VIDEO_TYPE_MP4;
 				}else if(this._videoUrl.indexOf("smile?v=")!=-1){
 					this._videoType = VideoType.VIDEO_TYPE_FLV;
@@ -112,7 +136,7 @@ package org.mineap.nicovideo4as
 					this._videoType = VideoType.VIDEO_TYPE_SWF;
 				}
 			}else{
-				dispatchEvent(new IOErrorEvent(VIDEO_URL_GET_FAIL, false, false, "UnknownUrl:" + unescape(decodeURIComponent(_apiAccess.data))));
+				dispatchEvent(new IOErrorEvent(VIDEO_URL_GET_FAIL, false, false, "UnknownUrl:" + unescape(decodeURIComponent(_apiGetFlvAccess.data))));
 				close();
 				return;
 			}
@@ -123,11 +147,22 @@ package org.mineap.nicovideo4as
 			}else{
 				//通常のダウンロード処理
 				var getVideo:URLRequest;
+				var intervalId: int;
+				if (this._apiDmcAccess != null) {
+					intervalId = setInterval(function (): void {
+						trace("DMCSessionBeating...");
+						this._apiDmcAccess.beatDmcSession(this._dmcResultAnalyzer.sessionId, this._dmcResultAnalyzer.session);
+					}, this._dmcResultAnalyzer.session.session.keep_method.heartbeat.lifetime * 0.9);
+					this._videoLoader.addEventListener(Event.COMPLETE, function (event: Event): void {
+						clearInterval(intervalId);
+					});
+					// interval clear if finished (not only success)
+//					this._videoLoader.addEventListener(Event.DEACTIVATE, )
+				}
 				getVideo = new URLRequest(this._videoUrl);
 				this._videoLoader.dataFormat=URLLoaderDataFormat.BINARY;
 				this._videoLoader.load(getVideo);
 			}
-			
 		}
 		
 		/**
@@ -164,10 +199,10 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function get economyMode():Boolean{
-			if(this._analyzer == null){
+			if(this._getFlvAnalyzer == null){
 				return false;
 			}
-			return this._analyzer.economyMode;
+			return this._getFlvAnalyzer.economyMode;
 		}
 		
 		/**
