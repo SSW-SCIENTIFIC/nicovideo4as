@@ -32,6 +32,7 @@ public class ApiDmcAccess extends URLLoader {
                 new URLRequestHeader("Referer", "http://www.nicovideo.jp/watch/" + movieId),
                 new URLRequestHeader("Origin", "http://www.nicovideo.jp")
             ];
+            getAPIRequest.manageCookies
 
             this.load(getAPIRequest);
         }

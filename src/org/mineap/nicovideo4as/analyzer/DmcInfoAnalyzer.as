@@ -6,9 +6,9 @@ public class DmcInfoAnalyzer {
         /** do nothing */
     }
 
-    public function analyze(dmcInfo: String): void
+    public function analyze(dmcInfo: Object): void
     {
-        this._result = JSON.parse(dmcInfo);
+        this._result = dmcInfo;
     }
 
     public function get isValid(): Boolean

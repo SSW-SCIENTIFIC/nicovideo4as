@@ -470,19 +470,29 @@ package org.mineap.nicovideo4as
 			}
 			
 			var jsonObj:Object = null;
-			
-			var regexp:RegExp = new RegExp("<div id=\"watchAPIDataContainer\" style=\"display:none\">(.+?)</div>");
-			
-			var obj:Object = regexp.exec(str);
-			
+
+            var regexp:RegExp = new RegExp("<div id=\"watchAPIDataContainer\" style=\"display:none\">(.+?)</div>");
+            var regexp2:RegExp = new RegExp("<div id=\"js-initial-watch-data\" data-api-data=\"([^\"]+)\"[^>]*>");
+
+            var obj:Object = regexp.exec(str);
+            var obj2:Object = regexp2.exec(str);
+
 			if (obj != null && obj[1] != null)
 			{
 				var jsonStr:String = obj[1];
 				jsonObj = JSON.parse(HtmlUtil.convertSpecialCharacterNotIncludedString(jsonStr));
 			}
+			else if (obj2 != null && obj[1] != null)
+			{
+				var jsonStr2:String = obj2[1]
+						.replace(/&quot;/g, "\"")
+						.replace(/&lt;/g, "<")
+						.replace(/&gt;/g, ">")
+						.replace(/&amp;/g, "&");
+				jsonObj = JSON.parse(jsonStr2);
+			}
 			
 			return jsonObj;
-			
 		}
 		
 		/**
@@ -502,6 +512,40 @@ package org.mineap.nicovideo4as
 		public function get jsonData():Object
 		{
 			return this._jsonObj;
+		}
+
+		public function get isDmc(): Boolean
+		{
+			if (this._jsonObj == null) {
+				return false;
+			}
+
+			if (this._jsonObj.hasOwnProperty("flashvars")) {
+				return (this._jsonObj.flashvars.isDmc == 1);
+			}
+
+			if (this._jsonObj.hasOwnProperty("video")) {
+				return (this._jsonObj.video.dmcInfo != null);
+			}
+
+			return false;
+		}
+
+		public function get dmcInfo(): Object
+		{
+			if (!this.isDmc) {
+				return null;
+			}
+
+            if (this._jsonObj.hasOwnProperty("flashvars")) {
+                return JSON.parse(decodeURIComponent(this._jsonObj.flashvars.dmcInfo));
+            }
+
+            if (this._jsonObj.hasOwnProperty("video")) {
+                return this._jsonObj.video.dmcInfo;
+            }
+
+			return null;
 		}
 		
 		/**
