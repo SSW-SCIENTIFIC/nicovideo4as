@@ -69,7 +69,10 @@ public class DmcInfoAnalyzer {
                     service_user_id: dmcInfo.service_user_id
                 },
                 client_info: { player_id: dmcInfo.player_id },
-                priority: (isPremium ? 0.8 : 0.4)
+                priority: (isPremium ?
+                        (dmcInfo.recipe_id.match(/so[0-9]+$/) ? 1 : 0.8)
+                        : (dmcInfo.recipe_id.match(/so[0-9]+$/) ? 0.6 : 0.4)
+                )
             }
         };
     }
