@@ -41,7 +41,7 @@ public class DmcInfoAnalyzer {
                     }
                 ],
                 timing_constraint: "unlimited",
-                keep_method: { heartbeat: { lifetime: 60000 } },
+                keep_method: { heartbeat: { lifetime: dmcInfo.heartbeat_lifetime } },
                 protocol: {
                     name: dmcInfo.protocols[0],
                     parameters: {
@@ -64,7 +64,7 @@ public class DmcInfoAnalyzer {
                 },
                 content_auth: {
                     auth_type: dmcInfo.auth_types.http,
-                    content_key_timeout: 600000,
+                    content_key_timeout: dmcInfo.content_key_timeout,
                     service_id: "nicovideo",
                     service_user_id: dmcInfo.service_user_id
                 },
