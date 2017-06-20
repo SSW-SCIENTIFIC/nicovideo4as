@@ -11,6 +11,10 @@ public class DmcInfoAnalyzer {
         this._result = dmcInfo;
     }
 
+    public function get dmcInfo(): Object {
+        return this._result;
+    }
+
     public function get isValid(): Boolean
     {
         return this._result != null;
@@ -18,7 +22,7 @@ public class DmcInfoAnalyzer {
 
     public function get apiUrl(): String
     {
-        return this._result.session_api.api_urls[0];
+        return this._result.session_api.urls[0].url;
     }
 
     public function getSession(isPremium: Boolean): Object {
@@ -48,8 +52,8 @@ public class DmcInfoAnalyzer {
                         http_parameters: {
                             parameters: {
                                 http_output_download_parameters: {
-                                    use_well_known_port: "no",
-                                    use_ssl: "no"
+                                    use_well_known_port: dmcInfo.urls[0].is_well_known_port ? "yes" : "no",
+                                    use_ssl: dmcInfo.urls[0].is_ssl ? "yes" : "no"
                                 }
                             }
                         }
