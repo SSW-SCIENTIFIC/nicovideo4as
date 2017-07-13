@@ -163,7 +163,7 @@ package org.mineap.nicovideo4as
 			// json形式でとれた場合はそれで返す (zero対応)
 			if (this._jsonObj != null)
 			{
-				var videoId:String = this._jsonObj.videoDetail.videoId;
+				var videoId:String = this._jsonObj.video.videoId;
 				if (videoId != null)
 				{
 					return videoId;
@@ -195,7 +195,7 @@ package org.mineap.nicovideo4as
 			// json形式でとれた場合はそれで返す (zero対応)
 			if (this._jsonObj != null)
 			{
-				var description:String = this._jsonObj.videoDetail.description;
+				var description:String = this._jsonObj.video.description;
 				if (description != null)
 				{
 					return HtmlUtil.convertCharacterCodeToCharacter(description);
@@ -244,9 +244,9 @@ package org.mineap.nicovideo4as
 			
 			if (this._jsonObj != null)
 			{
-				if (this._jsonObj.uploaderInfo != null)
+				if (this._jsonObj.owner != null)
 				{
-					return this._jsonObj.uploaderInfo.id;
+					return this._jsonObj.owner.id;
 				}
 			}
 			
@@ -272,9 +272,9 @@ package org.mineap.nicovideo4as
 			
 			if (this._jsonObj != null)
 			{
-				if (this._jsonObj.uploaderInfo != null)
+				if (this._jsonObj.owner != null)
 				{
-					return this._jsonObj.uploaderInfo.icon_url;
+					return this._jsonObj.owner.iconURL;
 				}
 			}
 			
@@ -300,9 +300,9 @@ package org.mineap.nicovideo4as
 			
 			if (this._jsonObj != null)
 			{
-				if (this._jsonObj.uploaderInfo != null)
+				if (this._jsonObj.owner != null)
 				{
-					return this._jsonObj.uploaderInfo.nickname;
+					return this._jsonObj.owner.nickname;
 				}
 			}
 			
@@ -328,9 +328,9 @@ package org.mineap.nicovideo4as
 			
 			if (this._jsonObj != null)
 			{
-				if (this._jsonObj.channelInfo != null)
+				if (this._jsonObj.channel != null)
 				{
-					return "ch" + this._jsonObj.channelInfo.id;
+					return "ch" + this._jsonObj.channel.id;
 				}
 			}
 			
@@ -355,9 +355,9 @@ package org.mineap.nicovideo4as
 			
 			if (this._jsonObj != null)
 			{
-				if (this._jsonObj.channelInfo != null)
+				if (this._jsonObj.channel != null)
 				{
-					return this._jsonObj.channelInfo.icon_url;
+					return this._jsonObj.channel.iconURL;
 				}
 			}
 			
@@ -382,9 +382,9 @@ package org.mineap.nicovideo4as
 			
 			if (this._jsonObj != null)
 			{
-				if (this._jsonObj.channelInfo != null)
+				if (this._jsonObj.channel != null)
 				{
-					return this._jsonObj.channelInfo.name;
+					return this._jsonObj.channel.name;
 				}
 			}
 			
@@ -409,7 +409,7 @@ package org.mineap.nicovideo4as
 		{
 			if (this._jsonObj != null)
 			{
-				return this._jsonObj.videoDetail.isR18;
+				return this._jsonObj.video.isR18;
 			}
 			
 			if (this._watchLoader != null && this._watchLoader.data != null)
@@ -431,10 +431,6 @@ package org.mineap.nicovideo4as
 		 */
 		public function get audioDownloadUrl():String
 		{
-			if (this._jsonObj != null)
-			{
-				return this._jsonObj.videoDetail.audioDownloadUrl;
-			}
 			return null;
 		}
 		
@@ -482,7 +478,7 @@ package org.mineap.nicovideo4as
 				var jsonStr:String = obj[1];
 				jsonObj = JSON.parse(HtmlUtil.convertSpecialCharacterNotIncludedString(jsonStr));
 			}
-			else if (obj2 != null && obj[1] != null)
+			else if (obj2 != null && obj2[1] != null)
 			{
 				var jsonStr2:String = obj2[1]
 						.replace(/&quot;/g, "\"")
