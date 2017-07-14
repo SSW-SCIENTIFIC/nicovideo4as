@@ -132,7 +132,9 @@ import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
 			
 			this._videoUrl = this._dmcResultAnalyzer.isValid ?
 					this._dmcResultAnalyzer.contentUri :
-					this._watchVideo.jsonData.video.smileInfo.url;
+					(this._watchVideo.isHTML5 ?
+							this._watchVideo.jsonData.video.smileInfo.url :
+                            this._getFlvAnalyzer.url);
 			
 			if(this._getFlvAnalyzer.url != null){
 				if(this._videoUrl.indexOf("smile?m=")!=-1 || this._apiDmcAccess != null){

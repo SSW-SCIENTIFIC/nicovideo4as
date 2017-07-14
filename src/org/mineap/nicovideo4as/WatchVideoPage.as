@@ -113,6 +113,9 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		private var _jsonObj:Object = null;
+
+		private var _isHTML5: Boolean = false;
+		private var _isFlash: Boolean = false;
 		
 		/**
 		 * 
@@ -161,13 +164,11 @@ package org.mineap.nicovideo4as
 		public function getVideoId():String{
 			
 			// json形式でとれた場合はそれで返す (zero対応)
-			if (this._jsonObj != null)
-			{
-				var videoId:String = this._jsonObj.video.videoId;
-				if (videoId != null)
-				{
-					return videoId;
-				}
+			if (this._isHTML5) {
+                return this._jsonObj.video.id;
+            }
+			if (this._isFlash) {
+				return this._jsonObj.videoDetail.id;
 			}
 			
 			if(this._watchLoader.data != null){
@@ -193,13 +194,11 @@ package org.mineap.nicovideo4as
 		public function getDescription():String{
 			
 			// json形式でとれた場合はそれで返す (zero対応)
-			if (this._jsonObj != null)
-			{
-				var description:String = this._jsonObj.video.description;
-				if (description != null)
-				{
-					return HtmlUtil.convertCharacterCodeToCharacter(description);
-				}
+			if (this._isHTML5) {
+				return this._jsonObj.video.description || "";
+			}
+			if (this._isFlash) {
+				return this._jsonObj.videoDetail.description || "";
 			}
 			
 			if (this._watchLoader.data != null) {
@@ -242,11 +241,14 @@ package org.mineap.nicovideo4as
 		 */
 		public function getPubUserId():String{
 			
-			if (this._jsonObj != null)
-			{
-				if (this._jsonObj.owner != null)
-				{
+			if (this._isHTML5) {
+				if (this._jsonObj.owner != null) {
 					return this._jsonObj.owner.id;
+				}
+			}
+			if (this._isFlash) {
+				if (this._jsonObj.uploaderInfo != null) {
+					return this._jsonObj.uploaderInfo.id;
 				}
 			}
 			
@@ -269,14 +271,17 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getPubUserIconUrl():String{
-			
-			if (this._jsonObj != null)
-			{
-				if (this._jsonObj.owner != null)
-				{
-					return this._jsonObj.owner.iconURL;
-				}
-			}
+
+            if (this._isHTML5) {
+                if (this._jsonObj.owner != null) {
+                    return this._jsonObj.owner.iconURL;
+                }
+            }
+            if (this._isFlash) {
+                if (this._jsonObj.uploaderInfo != null) {
+                    return this._jsonObj.uploaderInfo.icon_url;
+                }
+            }
 			
 			if(this._watchLoader != null && this._watchLoader.data != null){
 				var pubUserPattern:RegExp = new RegExp(pubUser);
@@ -297,14 +302,17 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getPubUserName():String{
-			
-			if (this._jsonObj != null)
-			{
-				if (this._jsonObj.owner != null)
-				{
-					return this._jsonObj.owner.nickname;
-				}
-			}
+
+            if (this._isHTML5) {
+                if (this._jsonObj.owner != null) {
+                    return this._jsonObj.owner.nickname;
+                }
+            }
+            if (this._isFlash) {
+                if (this._jsonObj.uploaderInfo != null) {
+                    return this._jsonObj.uploaderInfo.nickname;
+                }
+            }
 			
 			if(this._watchLoader != null && this._watchLoader.data != null){
 				var pubUserPattern:RegExp = new RegExp(pubUser);
@@ -325,14 +333,17 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getChannel():String{
-			
-			if (this._jsonObj != null)
-			{
-				if (this._jsonObj.channel != null)
-				{
-					return "ch" + this._jsonObj.channel.id;
-				}
-			}
+
+            if (this._isHTML5) {
+                if (this._jsonObj.channel != null) {
+                    return this._jsonObj.channel.id;
+                }
+            }
+            if (this._isFlash) {
+                if (this._jsonObj.channelInfo != null) {
+                    return this._jsonObj.channelInfo.id;
+                }
+            }
 			
 			if (this._watchLoader != null && this._watchLoader.data != null)
 			{
@@ -352,14 +363,17 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getChannelIconUrl():String{
-			
-			if (this._jsonObj != null)
-			{
-				if (this._jsonObj.channel != null)
-				{
-					return this._jsonObj.channel.iconURL;
-				}
-			}
+
+            if (this._isHTML5) {
+                if (this._jsonObj.channel != null) {
+                    return this._jsonObj.channel.iconURL;
+                }
+            }
+            if (this._isFlash) {
+                if (this._jsonObj.channelInfo != null) {
+                    return this._jsonObj.channelInfo.icon_url;
+                }
+            }
 			
 			if (this._watchLoader != null && this._watchLoader.data != null)
 			{
@@ -379,14 +393,17 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function getChannelName():String{
-			
-			if (this._jsonObj != null)
-			{
-				if (this._jsonObj.channel != null)
-				{
-					return this._jsonObj.channel.name;
-				}
-			}
+
+            if (this._isHTML5) {
+                if (this._jsonObj.channel != null) {
+                    return this._jsonObj.channel.name;
+                }
+            }
+            if (this._isFlash) {
+                if (this._jsonObj.channelInfo != null) {
+                    return this._jsonObj.channelInfo.name;
+                }
+            }
 			
 			if (this._watchLoader != null && this._watchLoader.data != null)
 			{
@@ -407,10 +424,12 @@ package org.mineap.nicovideo4as
 		 */
 		public function checkHarmful():Boolean
 		{
-			if (this._jsonObj != null)
-			{
-				return this._jsonObj.video.isR18;
-			}
+            if (this._isHTML5) {
+                return this._jsonObj.video.isR18;
+            }
+            if (this._isFlash) {
+                return this._jsonObj.videoDetail.isR18;
+            }
 			
 			if (this._watchLoader != null && this._watchLoader.data != null)
 			{
@@ -448,6 +467,16 @@ package org.mineap.nicovideo4as
 			
 			// 可能であればjsonオブジェクトを作る
 			this._jsonObj = createJsonObject(String(this._data));
+
+			if (this._jsonObj != null) {
+                if (this._jsonObj.hasOwnProperty("video")) {
+                    this._isHTML5 = true;
+                }
+
+                if (this._jsonObj.hasOwnProperty("flashvars")) {
+                    this._isFlash = true;
+                }
+            }
 			
 			dispatchEvent(new Event(WATCH_SUCCESS));
 		}
@@ -473,19 +502,18 @@ package org.mineap.nicovideo4as
             var obj:Object = regexp.exec(str);
             var obj2:Object = regexp2.exec(str);
 
-			if (obj != null && obj[1] != null)
-			{
+			if (obj != null && obj[1] != null) {
 				var jsonStr:String = obj[1];
 				jsonObj = JSON.parse(HtmlUtil.convertSpecialCharacterNotIncludedString(jsonStr));
-			}
-			else if (obj2 != null && obj2[1] != null)
-			{
+			} else if (obj2 != null && obj2[1] != null) {
 				var jsonStr2:String = obj2[1]
 						.replace(/&quot;/g, "\"")
 						.replace(/&lt;/g, "<")
 						.replace(/&gt;/g, ">")
 						.replace(/&amp;/g, "&");
 				jsonObj = JSON.parse(jsonStr2);
+			} else {
+				return null;
 			}
 			
 			return jsonObj;
@@ -516,11 +544,11 @@ package org.mineap.nicovideo4as
 				return false;
 			}
 
-			if (this._jsonObj.hasOwnProperty("flashvars")) {
+			if (this._isFlash) {
 				return (this._jsonObj.flashvars.isDmc == 1);
 			}
 
-			if (this._jsonObj.hasOwnProperty("video")) {
+			if (this._isHTML5) {
 				return (this._jsonObj.video.dmcInfo != null);
 			}
 
@@ -533,15 +561,46 @@ package org.mineap.nicovideo4as
 				return null;
 			}
 
-            if (this._jsonObj.hasOwnProperty("flashvars")) {
+            if (this._isFlash) {
                 return JSON.parse(decodeURIComponent(this._jsonObj.flashvars.dmcInfo));
             }
 
-            if (this._jsonObj.hasOwnProperty("video")) {
+            if (this._isHTML5) {
                 return this._jsonObj.video.dmcInfo;
             }
 
 			return null;
+		}
+
+		public function get smileInfo(): Object
+		{
+			if (this._isHTML5) {
+				return this._jsonObj.video.smileInfo;
+			}
+
+			return null;
+		}
+
+		public function get isPremium(): Boolean
+		{
+			if (this._isHTML5) {
+				return this._jsonObj.viewer.isPremium;
+			}
+			if (this._isFlash) {
+				return this._jsonObj.viewerInfo.isPremium;
+			}
+
+			return false;
+		}
+
+		public function get isHTML5 (): Boolean
+		{
+			return this._isHTML5;
+		}
+
+		public function get isFlash(): Boolean
+		{
+			return this._isFlash;
 		}
 		
 		/**
