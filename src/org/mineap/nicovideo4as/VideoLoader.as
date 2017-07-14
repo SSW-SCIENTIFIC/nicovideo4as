@@ -39,6 +39,8 @@ import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
 		private var _dmcInfoAnalyzer: DmcInfoAnalyzer;
 
 		private var _dmcResultAnalyzer: DmcResultAnalyzer;
+
+		private var _watchVideo: WatchVideoPage;
 		
 		private var _videoType:VideoType;
 		
@@ -66,16 +68,19 @@ import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
 		 * 	trueに設定すると、URL取得完了時にEvent(VIDEO_URL_GET_SUCCESS)が発行され、その後ダウンロード処理を行いません。
 		 * @param getflvAccess
 		 * @param dmcAccess
+		 * @param watchVideo
 		 */
 		public function getVideo(
 				isStreamingPlay:Boolean,
 				getflvAccess:ApiGetFlvAccess,
-				dmcAccess: ApiDmcAccess = null
+				dmcAccess: ApiDmcAccess = null,
+				watchVideo: WatchVideoPage = null
 		):void{
 			
 			this._isStreamingPlay = isStreamingPlay;
 			this._apiGetFlvAccess = getflvAccess;
 			this._apiDmcAccess = dmcAccess;
+			this._watchVideo = watchVideo;
 			
 			this._getVideo();
 		}
@@ -125,9 +130,11 @@ import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
 
 			this._getFlvAnalyzer.analyze(this._apiGetFlvAccess.data);
 			
-			this._videoUrl = this._dmcResultAnalyzer.isValid ? this._dmcResultAnalyzer.contentUri : this._getFlvAnalyzer.url;
+			this._videoUrl = this._dmcResultAnalyzer.isValid ?
+					this._dmcResultAnalyzer.contentUri :
+					this._watchVideo.jsonData.video.smileInfo.url;
 			
-			if(this._videoUrl != null){
+			if(this._getFlvAnalyzer.url != null){
 				if(this._videoUrl.indexOf("smile?m=")!=-1 || this._apiDmcAccess != null){
 					this._videoType = VideoType.VIDEO_TYPE_MP4;
 				}else if(this._videoUrl.indexOf("smile?v=")!=-1){
