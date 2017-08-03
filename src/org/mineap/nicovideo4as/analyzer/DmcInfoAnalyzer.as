@@ -20,6 +20,11 @@ public class DmcInfoAnalyzer {
         return this._result != null;
     }
 
+    public function get isAvailable(): Boolean
+    {
+        return this.isValid && this._result.session_api;
+    }
+
     public function get apiUrl(): String
     {
         return this._result.session_api.urls[0].url;
