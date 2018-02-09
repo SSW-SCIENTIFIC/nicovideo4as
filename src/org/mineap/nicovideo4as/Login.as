@@ -38,16 +38,23 @@ package org.mineap.nicovideo4as
 		private var _url:String = null;
 		private var _user:String = null;
 		private var _password:String = null;
+		private var _otp: String = null;
+		private var _deviceName: String = null;
 		
 		/**
 		 * ニコニコ動画のログインURLです。
 		 */
-		public static const LOGIN_URL:String = "https://secure.nicovideo.jp/secure/login?site=niconico";
+		public static const LOGIN_URL:String = "https://account.nicovideo.jp/api/v1/login";
+
+        /**
+		 * 多段階認証
+         */
+		public static const MULTI_FACTOR_AUTHENTICATION_URL: String = "https://account.nicovideo.jp/mfa";
 		
 		/**
 		 * ニコニコ動画のログアウトURLです。
 		 */
-		public static const LOGOUT_URL:String = "https://secure.nicovideo.jp/secure/logout";
+		public static const LOGOUT_URL:String = "https://account.nicovideo.jp/logout";
 		
 		/**
 		 * ニコニコ動画へのログインに失敗した際に返されるメッセージです。
@@ -58,11 +65,13 @@ package org.mineap.nicovideo4as
 		 * ニコニコ動画のトップページURLです。
 		 */
 		public static const TOP_PAGE_URL:String = "http://www.nicovideo.jp/";
-		
+
 		/**
 		 * 
 		 */
 		public static const LOGIN_SUCCESS:String = "LoginSuccess";
+
+		public static const MULTI_FACTOR_AUTHENTICATION_REQUIRED: String = "MultiFactorAuthenticationRequired";
 		
 		/**
 		 * 
@@ -88,6 +97,8 @@ package org.mineap.nicovideo4as
 		 * 
 		 * @param user ログイン名です。
 		 * @param password ログインパスワードです。
+		 * @param otp ワンタイムパッド
+		 * @param deviceName デバイス名
 		 * @param url ログインに使うURLです。
 		 * @param isRetry このフラグがtrueで、かつIOエラーが発生したときに、ログアウト→ログインの順で一度だけ再試行します。
 		 * @param preCheck ログイン前に、既にログイン済みかどうかのチェックを行い、ログイン済みの場合はログイン処理を行いません。
@@ -95,7 +106,9 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function login(user:String, 
-							  password:String, 
+							  password:String,
+							  otp: String = null,
+							  deviceName: String = null,
 							  url:String=LOGIN_URL, 
 							  isRetry:Boolean = true,
 							  preCheck:Boolean = true):void{
@@ -104,6 +117,8 @@ package org.mineap.nicovideo4as
 			this._url = url;
 			this._user = user;
 			this._password = password;
+			this._otp = otp;
+			this._deviceName = deviceName;
 			
 			if(preCheck){
 				this._loginChecker = new LoginChecker();
@@ -125,7 +140,7 @@ package org.mineap.nicovideo4as
 			this._loginLoader = new URLLoader();
 			
 			var variables:URLVariables = new URLVariables();
-			variables.mail = this._user;
+			variables.mail_tel = this._user;
 			variables.password = this._password;
 			
 			this._loginRequest = new URLRequest(this._url);
@@ -179,7 +194,7 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		private function timerEventHandler(event:Event):void{
-			login(String(this._loginRequest.data.mail), String(this._loginRequest.data.password), this._url, false);
+			login(String(this._loginRequest.data.mail), String(this._loginRequest.data.password), this._otp, this._deviceName, this._url, false);
 		}
 		
 		/**
@@ -224,10 +239,21 @@ package org.mineap.nicovideo4as
 			trace("x_niconico_authflag=" + value);
 			if (value == NicoAuthFlagType.NICO_AUTH_FLAG_FAILURE.Type)
 			{
-				dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, LOGIN_FAIL_MESSAGE));
-				return;
-			}
-			else if (value == NicoAuthFlagType.NICO_AUTH_FLAG_SUCCESS.Type 
+                if (event.responseURL.indexOf(MULTI_FACTOR_AUTHENTICATION_URL) == -1) {
+                    dispatchEvent(new ErrorEvent(LOGIN_FAIL, false, false, LOGIN_FAIL_MESSAGE));
+                    return;
+                }
+
+                trace("OTP: " + this._otp + ", DeviceName: " + this._deviceName);
+
+                if (!this._otp || !this._deviceName) {
+                    dispatchEvent(new Event(MULTI_FACTOR_AUTHENTICATION_REQUIRED));
+                    return;
+                }
+
+                multiFactorAuthentication(event.responseURL, this._otp, true, this._deviceName);
+                return;
+			} else if (value == NicoAuthFlagType.NICO_AUTH_FLAG_SUCCESS.Type
 						|| value == NicoAuthFlagType.NICO_AUTH_FLAG_PREMIUM_SUCCESS.Type)
 			{
 				// ログイン成功
@@ -241,7 +267,22 @@ package org.mineap.nicovideo4as
 			dispatchEvent(new Event(LOGIN_SUCCESS));
 		}
 		
-		
+		public function multiFactorAuthentication(url: String, otp: String, trust: Boolean = false, deviceName: String = null): void {
+			trace("MFA entering... " + url);
+            var variables: URLVariables = new URLVariables();
+            variables.otp = otp;
+            variables.is_mfa_trusted_device = trust;
+			variables.device_name = deviceName;
+
+            this._loginRequest = new URLRequest(url);
+            this._loginRequest.method = URLRequestMethod.POST;
+            this._loginRequest.data = variables;
+
+            this._loginLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpCompleteHandler);
+            this._loginLoader.addEventListener(IOErrorEvent.IO_ERROR, errorHandler);
+            this._loginLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, errorHandler);
+            this._loginLoader.load(this._loginRequest);
+		}
 		
 		/**
 		 * 
