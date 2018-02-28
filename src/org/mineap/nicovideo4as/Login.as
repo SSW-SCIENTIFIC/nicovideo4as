@@ -77,6 +77,8 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public static const LOGIN_FAIL:String = "LoginFail";
+
+		public static const NO_LOGIN: String = "NoLogin";
 		
 		/**
 		 * 
@@ -105,8 +107,8 @@ package org.mineap.nicovideo4as
 		 * @return 
 		 * 
 		 */
-		public function login(user:String, 
-							  password:String,
+		public function login(user:String = null,
+							  password:String = null,
 							  otp: String = null,
 							  deviceName: String = null,
 							  url:String=LOGIN_URL, 
@@ -119,7 +121,13 @@ package org.mineap.nicovideo4as
 			this._password = password;
 			this._otp = otp;
 			this._deviceName = deviceName;
-			
+
+			if (!this._user && !this._password) {
+				trace("ログインしない");
+				dispatchEvent(new Event(NO_LOGIN));
+				return;
+			}
+
 			if(preCheck){
 				this._loginChecker = new LoginChecker();
 				this._loginChecker.addEventListener(Event.COMPLETE, checkCompleteEventHandler);
@@ -158,6 +166,11 @@ package org.mineap.nicovideo4as
 		 * 
 		 */
 		public function logout():void{
+			if (!this._user && !this._password) {
+				trace("ログインせず利用");
+				dispatchEvent(new Event(LOGOUT_COMPLETE));
+				return;
+			}
 			
 			this._logoutLoader = new URLLoader();
 			
