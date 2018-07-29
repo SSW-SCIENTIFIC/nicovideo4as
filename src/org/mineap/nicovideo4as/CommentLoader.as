@@ -167,7 +167,7 @@ package org.mineap.nicovideo4as
 					　force_184="1" 
 						　/> 
 					*/
-					xml = new XML("<thread/>");
+					xml = new XML("<thread />");
 					xml.@thread = this._getflvAnalyzer.threadId;
 					xml.@version = "20061206";
 					xml.@res_from = (this._count * -1);
@@ -177,7 +177,7 @@ package org.mineap.nicovideo4as
 						xml.@[key] = getThreadKeyResultAnalyzer.getValue(key);
 					}
 					
-					xml = new XML("<packet/>").appendChild(xml);
+					xml = new XML("<packet />").appendChild(xml);
 				
 				}
 				else
@@ -223,7 +223,7 @@ package org.mineap.nicovideo4as
 					
 					// 普通のコメント
 					
-					xml = new XML("<thread/>");
+					xml = new XML("<thread />");
 					xml.@res_from = (this._count * -1);
 					if(this._isOwnerComment){
 						xml.@fork = 1;
@@ -239,7 +239,7 @@ package org.mineap.nicovideo4as
 						xml.@waybackkey = this._waybackkey;
 					}
 					
-					xml = new XML("<packet/>").appendChild(xml);
+					xml = new XML("<packet />").appendChild(xml);
 					
 				}
 				else
@@ -280,7 +280,10 @@ package org.mineap.nicovideo4as
 			getComment.data = xml;
 			
 			this._commentLoader.dataFormat=URLLoaderDataFormat.TEXT;
-			
+
+            this._commentLoader.addEventListener(HTTPStatusEvent.HTTP_STATUS, function (event: HTTPStatusEvent): void {
+                trace("Error: " + event.toString());
+            });
 			this._commentLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatusEventHandler);
 			this._commentLoader.addEventListener(Event.COMPLETE, commentGetSuccess);
 			this._commentLoader.addEventListener(IOErrorEvent.IO_ERROR, errorEventHandler);
