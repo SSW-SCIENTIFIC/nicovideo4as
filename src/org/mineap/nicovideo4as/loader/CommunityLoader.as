@@ -28,13 +28,13 @@ package org.mineap.nicovideo4as.loader {
          * @param page
          *
          */
-        public function getCommunity(communityId: String, page: int = null): void {
+        public function getCommunity(communityId: String, page: int = 0): void {
 
             var url: String = COMMUNITY_PAGE_URL + communityId;
 
             var variables: URLVariables = new URLVariables();
             variables.rss = "2.0";
-            if (page) {
+            if (page > 0) {
                 variables.page = page;
             }
 

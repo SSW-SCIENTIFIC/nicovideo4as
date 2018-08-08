@@ -1,6 +1,8 @@
 package org.mineap.nicovideo4as.stream {
     import flash.net.URLRequest;
+    import flash.net.URLRequestHeader;
     import flash.net.URLStream;
+    import flash.net.URLVariables;
 
     import org.mineap.nicovideo4as.model.VideoType;
 
@@ -26,14 +28,20 @@ package org.mineap.nicovideo4as.stream {
          * 指定されたURLから動画をロードします。
          *
          * @param url
+         * @param start
+         * @param end
          * @see URLStream#load(URLRequest)
          */
-        public function getVideoStart(url: String): void {
+        public function getVideoStart(url: String, start: Number = 0, end: Number = 0): void {
 
             this._videoType = checkVideoType(url);
 
-            super.load(new URLRequest(url));
+            var request: URLRequest = new URLRequest(url);
+            if (start !== 0 || end !== 0) {
+                request.requestHeaders = [new URLRequestHeader("Range", "bytes=" + start + "-" + (end > 0 ? end : ""))];
+            }
 
+            super.load(request);
         }
 
         /**

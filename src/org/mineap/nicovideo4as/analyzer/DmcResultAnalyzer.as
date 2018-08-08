@@ -29,5 +29,9 @@ package org.mineap.nicovideo4as.analyzer {
         public function get contentUri(): String {
             return this._result.data.session.content_uri;
         }
+
+        public function reset(): void {
+            this._result = null;
+        }
     }
 }
