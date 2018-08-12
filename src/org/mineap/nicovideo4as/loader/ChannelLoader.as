@@ -11,7 +11,7 @@ package org.mineap.nicovideo4as.loader {
      */
     public class ChannelLoader extends URLLoader {
 
-        public static const CHANNEL_PAGE_URL: String = "http://ch.nicovideo.jp/video/";
+        public static const CHANNEL_PAGE_URL: String = "https://ch.nicovideo.jp/video/";
 
         /**
          *
