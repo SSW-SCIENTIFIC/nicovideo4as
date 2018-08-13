@@ -27,12 +27,15 @@ package org.mineap.nicovideo4as.loader {
          * @param channelId
          *
          */
-        public function getChannel(channelId: String): void {
+        public function getChannel(channelId: String, page: int = 0): void {
 
             var url: String = CHANNEL_PAGE_URL + channelId;
 
             var variables: URLVariables = new URLVariables();
             variables.rss = "2.0";
+            if (page > 0) {
+                variables.page = page;
+            }
 
             var request: URLRequest = new URLRequest(url);
             request.data = variables;
