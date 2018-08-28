@@ -67,7 +67,7 @@ package org.mineap.nicovideo4as.analyzer {
                         service_user_id: dmcInfo.service_user_id
                     },
                     client_info: { player_id: dmcInfo.player_id },
-                    priority: (isPremium ? (dmcInfo.recipe_id.match(/so[0-9]+$/) ? 1 : 0.8) : (dmcInfo.recipe_id.match(/so[0-9]+$/) ? 0.6 : 0.4))
+                    priority: dmcInfo.priority
                 }
             };
         }

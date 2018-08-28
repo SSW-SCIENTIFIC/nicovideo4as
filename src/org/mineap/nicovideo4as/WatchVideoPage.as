@@ -447,15 +447,17 @@ package org.mineap.nicovideo4as {
 
             // 可能であればjsonオブジェクトを作る
             this._jsonObj = createJsonObject(String(this._data));
+            if (this._jsonObj === null) {
+                dispatchEvent(new ErrorEvent(WATCH_FAIL));
+                return;
+            }
 
-            if (this._jsonObj != null) {
-                if (this._jsonObj.hasOwnProperty("video")) {
-                    this._isHTML5 = true;
-                }
+            if (this._jsonObj.hasOwnProperty("video")) {
+                this._isHTML5 = true;
+            }
 
-                if (this._jsonObj.hasOwnProperty("flashvars")) {
-                    this._isFlash = true;
-                }
+            if (this._jsonObj.hasOwnProperty("flashvars")) {
+                this._isFlash = true;
             }
 
             dispatchEvent(new Event(WATCH_SUCCESS));
