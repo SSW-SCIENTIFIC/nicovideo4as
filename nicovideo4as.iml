@@ -4,7 +4,7 @@
     <configurations>
       <configuration name="nicovideo4as" target-platform="Desktop" output-type="Library" output-file="nicovideo4as.swc" output-folder="$MODULE_DIR$/bin">
         <dependencies>
-          <sdk name="AIRSDK_Compiler" />
+          <sdk name="4.16.1" />
         </dependencies>
         <compiler-options>
           <map>
@@ -23,7 +23,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="AIRSDK_Compiler" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="4.16.1" jdkType="Flex SDK Type (new)" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

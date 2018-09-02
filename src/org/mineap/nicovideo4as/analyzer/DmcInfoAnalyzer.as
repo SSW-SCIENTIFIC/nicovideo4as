@@ -26,7 +26,7 @@ package org.mineap.nicovideo4as.analyzer {
             return this._result.session_api.urls[0].url;
         }
 
-        public function getSession(isPremium: Boolean): Object {
+        public function getSession(hls: Boolean = false): Object {
             var dmcInfo: Object = this._result.session_api;
             return {
                 session: {
@@ -42,18 +42,7 @@ package org.mineap.nicovideo4as.analyzer {
                     }],
                     timing_constraint: "unlimited",
                     keep_method: { heartbeat: { lifetime: dmcInfo.heartbeat_lifetime } },
-                    protocol: {
-                        name: dmcInfo.protocols[0], parameters: {
-                            http_parameters: {
-                                parameters: {
-                                    http_output_download_parameters: {
-                                        use_well_known_port: dmcInfo.urls[0].is_well_known_port ? "yes" : "no",
-                                        use_ssl: dmcInfo.urls[0].is_ssl ? "yes" : "no"
-                                    }
-                                }
-                            }
-                        }
-                    },
+                    protocol: hls ? this.protocolHLS() : this.protocolHTTP(),
                     content_uri: "",
                     session_operation_auth: {
                         session_operation_auth_by_signature: {
@@ -68,6 +57,43 @@ package org.mineap.nicovideo4as.analyzer {
                     },
                     client_info: { player_id: dmcInfo.player_id },
                     priority: dmcInfo.priority
+                }
+            };
+        }
+
+        private function protocolHLS(): Object {
+            var dmcInfo: Object = this._result.session_api;
+            return {
+                name: dmcInfo.protocols[0],
+                parameters: {
+                    http_parameters: {
+                        parameters: {
+                            hls_parameters: {
+                                segment_duration: 5000,
+                                transfer_preset: dmcInfo.transfer_presets[0],
+                                use_well_known_port: dmcInfo.urls[0].is_well_known_port ? "yes" : "no",
+                                use_ssl: dmcInfo.urls[0].is_ssl ? "yes" : "no"
+                            }
+                        }
+                    }
+                }
+            };
+        }
+
+        private function protocolHTTP(): Object {
+            var dmcInfo: Object = this._result.session_api;
+            return {
+                name: dmcInfo.protocols[0],
+                parameters: {
+                    http_parameters: {
+                        parameters: {
+                            http_output_download_parameters: {
+                                transfer_preset: dmcInfo.transfer_presets[0],
+                                use_well_known_port: dmcInfo.urls[0].is_well_known_port ? "yes" : "no",
+                                use_ssl: dmcInfo.urls[0].is_ssl ? "yes" : "no"
+                            }
+                        }
+                    }
                 }
             };
         }
