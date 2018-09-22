@@ -22,6 +22,10 @@ package org.mineap.nicovideo4as.analyzer {
             return this.isValid && this._result.session_api;
         }
 
+        public function get isHLSAvailable(): Boolean {
+            return this.isAvailable && (this.dmcInfo.session_api.protocols.indexOf("hls") !== -1);
+        }
+
         public function get apiUrl(): String {
             return this._result.session_api.urls[0].url;
         }
@@ -42,7 +46,7 @@ package org.mineap.nicovideo4as.analyzer {
                     }],
                     timing_constraint: "unlimited",
                     keep_method: { heartbeat: { lifetime: dmcInfo.heartbeat_lifetime } },
-                    protocol: hls ? this.protocolHLS() : this.protocolHTTP(),
+                    protocol: hls && this.isHLSAvailable ? this.protocolHLS() : this.protocolHTTP(),
                     content_uri: "",
                     session_operation_auth: {
                         session_operation_auth_by_signature: {
