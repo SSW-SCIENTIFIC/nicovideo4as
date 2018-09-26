@@ -51,7 +51,7 @@ package org.mineap.nicovideo4as {
         /**
          * ニコニコ動画のログアウトURLです。
          */
-        public static const LOGOUT_URL: String = "https://account.nicovideo.jp/logout";
+        public static const LOGOUT_URL: String = "https://secure.nicovideo.jp/secure/logout";
 
         /**
          * ニコニコ動画へのログインに失敗した際に返されるメッセージです。
