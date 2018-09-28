@@ -568,6 +568,10 @@ package org.mineap.nicovideo4as {
             return false;
         }
 
+        public function get channelId(): String {
+            return this._jsonObj.channel && this._jsonObj.channel.id;
+        }
+
         public function get isHTML5(): Boolean {
             return this._isHTML5;
         }

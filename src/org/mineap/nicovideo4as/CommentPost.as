@@ -100,7 +100,7 @@ package org.mineap.nicovideo4as {
         protected function loginSuccessHandler(event: Event): void {
             this._watchLoader.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
             this._watchLoader.addEventListener(WatchVideoPage.WATCH_FAIL, networkErrorHandler);
-            this._watchLoader.addEventListener(WatchVideoPage.WATCH_SUCCESS, getflvSuccessHandler);
+            this._watchLoader.addEventListener(WatchVideoPage.WATCH_SUCCESS, getWatchPageSuccessHandler);
             this._watchLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, function (event: HTTPStatusEvent): void {
                 trace(event);
 
@@ -130,14 +130,18 @@ package org.mineap.nicovideo4as {
          * 動画ページを見に行った後に呼ばれます
          *
          */
-        protected function getflvSuccessHandler(event: Event): void {
+        protected function getWatchPageSuccessHandler(event: Event): void {
             this._getflvAccess.addEventListener(IOErrorEvent.IO_ERROR, networkErrorHandler);
             this._getflvAccess.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatusEventHandler);
             this._getflvAccess.addEventListener(Event.COMPLETE, getflvLoadedHandler);
             // alwaysEconomy フラグを false にしていますが、動画 URL を取得するわけではないので関係ないはず。
 
+            if (this._watchLoader.channelId !== null) {
+                // チャンネル動画では184コマンドがあると投稿不可
+                this._is184 = false;
+            }
+
             if (_isRedirected) {
-                // チャンネル動画
                 this._getflvAccess.getAPIResult(this._redirectedVideoId, false);
             } else {
                 this._getflvAccess.getAPIResult(this._videoId, false);
