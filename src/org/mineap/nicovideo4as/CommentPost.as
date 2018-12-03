@@ -10,6 +10,9 @@ package org.mineap.nicovideo4as {
     import flash.net.URLRequest;
     import flash.net.URLRequestHeader;
 
+    import org.mineap.nicovideo4as.analyzer.GetFlvResultAnalyzer;
+    import org.mineap.nicovideo4as.api.ApiGetBgmAccess;
+
     import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
 
     [Event(name="commentPostSuccess", type="CommentPost")]
@@ -153,7 +156,13 @@ package org.mineap.nicovideo4as {
          * @author edvakf
          */
         protected function getflvLoadedHandler(event: Event): void {
-            this.postComment(this._videoId, this._mail, this._comment, this._vpos, this._getflvAccess, this._is184);
+            var analyzer: GetFlvResultAnalyzer = new GetFlvResultAnalyzer();
+            if (this._watchLoader.isFlash) {
+                analyzer.analyze(this._watchLoader.jsonData.flashvars.flvInfo || "");
+            } else {
+                analyzer.analyze(this._getflvAccess.data);
+            }
+            this.postComment(this._videoId, this._mail, this._comment, this._vpos, analyzer, this._is184);
         }
 
         /**
@@ -163,11 +172,18 @@ package org.mineap.nicovideo4as {
          * @param mail コメントのコマンド
          * @param comment 投稿するコメント
          * @param vpos 動画を投稿するvpos
+         * @param flvAnalyzer getFlvの解析結果
          * @param is184 匿名でコメントするかどうか
          * @return
          *
          */
-        public function postComment(videoId: String, mail: String, comment: String, vpos: int, apiAccess: ApiGetFlvAccess, is184: Boolean): void {
+        public function postComment(
+            videoId: String, mail: String,
+            comment: String,
+            vpos: int,
+            flvAnalyzer: GetFlvResultAnalyzer,
+            is184: Boolean
+        ): void {
 
             this._comment = comment;
             this._mail = mail;
@@ -178,7 +194,7 @@ package org.mineap.nicovideo4as {
             this._commentLoader.addEventListener(CommentLoader.COMMENT_GET_FAIL, networkErrorHandler);
             this._commentLoader.addEventListener(HTTPStatusEvent.HTTP_RESPONSE_STATUS, httpResponseStatusEventHandler);
             //TODO コメントローダーにAPIアクセサを渡さないと行けない。
-            this._commentLoader.getComment(videoId, 1, false, apiAccess);
+            this._commentLoader.getComment(videoId, 1, false, flvAnalyzer);
         }
 
         /**

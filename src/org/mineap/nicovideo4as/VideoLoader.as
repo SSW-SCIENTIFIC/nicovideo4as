@@ -28,8 +28,6 @@ package org.mineap.nicovideo4as {
 
         private var _videoLoader: URLLoader;
 
-        private var _apiGetFlvAccess: ApiGetFlvAccess;
-
         private var _apiDmcAccess: ApiDmcAccess;
 
         private var _getFlvAnalyzer: GetFlvResultAnalyzer;
@@ -63,16 +61,21 @@ package org.mineap.nicovideo4as {
          *
          * @param isStreamingPlay ストリーミング再生かどうかです。
          *    trueに設定すると、URL取得完了時にEvent(VIDEO_URL_GET_SUCCESS)が発行され、その後ダウンロード処理を行いません。
-         * @param getflvAccess
+         * @param flvAnalyzer
          * @param dmcAccess
          * @param watchVideo
          */
-        public function getVideo(isStreamingPlay: Boolean, getflvAccess: ApiGetFlvAccess, dmcAccess: ApiDmcAccess = null, watchVideo: WatchVideoPage = null): void {
+        public function getVideo(
+            isStreamingPlay: Boolean,
+            flvAnalyzer: GetFlvResultAnalyzer,
+            dmcAccess: ApiDmcAccess = null,
+            watchVideo: WatchVideoPage = null
+        ): void {
 
             this._isStreamingPlay = isStreamingPlay;
-            this._apiGetFlvAccess = getflvAccess;
             this._apiDmcAccess = dmcAccess;
             this._watchVideo = watchVideo;
+            this._getFlvAnalyzer = flvAnalyzer;
 
             this._getVideo();
         }
@@ -112,7 +115,6 @@ package org.mineap.nicovideo4as {
         private function _getVideo(): void {
 //			trace(unescape(decodeURIComponent(_apiGetFlvAccess.data)));
 
-            this._getFlvAnalyzer = new GetFlvResultAnalyzer();
             this._dmcInfoAnalyzer = new DmcInfoAnalyzer();
             this._dmcResultAnalyzer = new DmcResultAnalyzer();
 
@@ -120,9 +122,17 @@ package org.mineap.nicovideo4as {
                 this._dmcResultAnalyzer.analyze(this._apiDmcAccess.data);
             }
 
-            this._getFlvAnalyzer.analyze(this._apiGetFlvAccess.data);
+            this._videoUrl = (function (): String {
+                if (_dmcResultAnalyzer.isValid) {
+                    return _dmcResultAnalyzer.contentUri;
+                }
 
-            this._videoUrl = this._dmcResultAnalyzer.isValid ? this._dmcResultAnalyzer.contentUri : (this._watchVideo.isHTML5 ? this._watchVideo.jsonData.video.smileInfo.url : this._getFlvAnalyzer.url);
+                if (_watchVideo.isHTML5) {
+                    return _watchVideo.jsonData.video.smileInfo.url;
+                }
+
+                return _getFlvAnalyzer.url;
+            })();
 
             if (this._getFlvAnalyzer.url != null) {
                 if (this._videoUrl.indexOf("smile?m=") != -1 || this._apiDmcAccess != null) {
@@ -133,7 +143,14 @@ package org.mineap.nicovideo4as {
                     this._videoType = VideoType.VIDEO_TYPE_SWF;
                 }
             } else {
-                dispatchEvent(new IOErrorEvent(VIDEO_URL_GET_FAIL, false, false, "UnknownUrl:" + unescape(decodeURIComponent(_apiGetFlvAccess.data))));
+                dispatchEvent(
+                    new IOErrorEvent(
+                        VIDEO_URL_GET_FAIL,
+                        false,
+                        false,
+                        "UnknownUrl:" + unescape(decodeURIComponent(this._getFlvAnalyzer.result))
+                    )
+                );
                 close();
                 return;
             }
@@ -148,7 +165,7 @@ package org.mineap.nicovideo4as {
                 if (this._apiDmcAccess != null) {
                     intervalId = setInterval(function (): void {
                         trace("DMCSessionBeating...");
-                        this._apiDmcAccess.beatDmcSession(this._dmcResultAnalyzer.sessionId, this._dmcResultAnalyzer.session);
+                        _apiDmcAccess.beatDmcSession(_dmcResultAnalyzer.sessionId, _dmcResultAnalyzer.session);
                     }, this._dmcResultAnalyzer.session.session.keep_method.heartbeat.lifetime * 0.9);
                     this._videoLoader.addEventListener(Event.COMPLETE, function (event: Event): void {
                         clearInterval(intervalId);

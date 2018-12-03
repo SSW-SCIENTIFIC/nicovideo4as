@@ -13,6 +13,7 @@ package org.mineap.nicovideo4as {
 
     import org.mineap.nicovideo4as.analyzer.CommentAnalyzer;
     import org.mineap.nicovideo4as.analyzer.GetFlvResultAnalyzer;
+    import org.mineap.nicovideo4as.analyzer.GetFlvResultAnalyzer;
     import org.mineap.nicovideo4as.analyzer.GetThreadKeyResultAnalyzer;
     import org.mineap.nicovideo4as.loader.api.ApiGetFlvAccess;
     import org.mineap.nicovideo4as.loader.api.ApiGetThreadkeyAccess;
@@ -75,17 +76,15 @@ package org.mineap.nicovideo4as {
          * @param videoId コメントを取得したい動画の動画ID。
          * @param count 取得するコメントの数。
          * @param isOwnerComment 投稿者コメントかどうか
-         * @param apiAccess getFlvにアクセスするApiGetFlvAccessオブジェクト
+         * @param flvAnalyzer getFlvの解析結果
          * @param when 過去ログを取得する際の取得開始時刻
          * @param waybackkey 過去ログを取得する際に必要なwaybackkey
          * @param useOldType 通常コメント取得時に古い形式のコメント取得方法を使うかどうか(過去ログ、投稿者コメントでは無効)
          */
-        public function getComment(videoId: String, count: int, isOwnerComment: Boolean, apiAccess: ApiGetFlvAccess, when: Date = null, waybackkey: String = null, useOldType: Boolean = false): void {
+        public function getComment(videoId: String, count: int, isOwnerComment: Boolean, flvAnalyzer: GetFlvResultAnalyzer, when: Date = null, waybackkey: String = null, useOldType: Boolean = false): void {
             this._count = count;
 
-            this._apiAccess = apiAccess;
-
-            this._getflvAnalyzer = new GetFlvResultAnalyzer();
+            this._getflvAnalyzer = flvAnalyzer;
 
             this._isOwnerComment = isOwnerComment;
 
@@ -95,10 +94,8 @@ package org.mineap.nicovideo4as {
 
             this._useOldType = useOldType;
 
-            var isSucess: Boolean = _getflvAnalyzer.analyze(apiAccess.data);
-
-            if (!isSucess) {
-                dispatchEvent(new IOErrorEvent(COMMENT_GET_FAIL, false, false, _getflvAnalyzer.result));
+            if (!this._getflvAnalyzer.done) {
+                dispatchEvent(new IOErrorEvent(COMMENT_GET_FAIL, false, false, this._getflvAnalyzer.result));
                 close();
                 return;
             }
@@ -390,11 +387,6 @@ package org.mineap.nicovideo4as {
             try {
                 this._apiGetThreadkeyAccess.close();
             } catch (error: Error) {
-            }
-            try {
-                this._apiAccess.close();
-            } catch (error: Error) {
-
             }
         }
 
