@@ -111,7 +111,7 @@ package org.mineap.nicovideo4as.analyzer {
 
         private var _time: Number = 0;
 
-        private var _done: Boolean = false;
+        protected var _done: Boolean = false;
 
         private var _needs_key: int = 0;
 

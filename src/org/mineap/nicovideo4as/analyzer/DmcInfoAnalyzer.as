@@ -54,7 +54,7 @@ package org.mineap.nicovideo4as.analyzer {
                         }
                     },
                     content_auth: {
-                        auth_type: dmcInfo.auth_types.http,
+                        auth_type: hls ? dmcInfo.auth_types.hls : dmcInfo.auth_types.http,
                         content_key_timeout: dmcInfo.content_key_timeout,
                         service_id: "nicovideo",
                         service_user_id: dmcInfo.service_user_id
@@ -67,8 +67,8 @@ package org.mineap.nicovideo4as.analyzer {
 
         private function protocolHLS(): Object {
             var dmcInfo: Object = this._result.session_api;
-            return {
-                name: dmcInfo.protocols[0],
+            var result: Object = {
+                name: "http",
                 parameters: {
                     http_parameters: {
                         parameters: {
@@ -82,12 +82,17 @@ package org.mineap.nicovideo4as.analyzer {
                     }
                 }
             };
+
+            if (this._result.encryption) {
+                result.parameters.http_parameters.parameters.hls_parameters.encryption = this._result.encryption;
+            }
+            return result;
         }
 
         private function protocolHTTP(): Object {
             var dmcInfo: Object = this._result.session_api;
             return {
-                name: dmcInfo.protocols[0],
+                name: "http",
                 parameters: {
                     http_parameters: {
                         parameters: {
