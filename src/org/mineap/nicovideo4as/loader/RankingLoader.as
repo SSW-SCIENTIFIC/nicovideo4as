@@ -7,6 +7,7 @@ package org.mineap.nicovideo4as.loader {
     import flash.events.SecurityErrorEvent;
     import flash.net.URLLoader;
     import flash.net.URLRequest;
+    import flash.net.URLRequest;
     import flash.net.URLVariables;
 
     import org.mineap.nicovideo4as.model.NicoRankingUrl;
@@ -33,32 +34,22 @@ package org.mineap.nicovideo4as.loader {
          * 指定された期間、種別からURLを生成し、ランキングにアクセスします。
          * 期間、種別は{@link NicoRankingUrl}を参照してください。
          *
-         * @param period NicoRankingUrlクラスの期間に関するプロパティを参照してください。
-         * @param target NicoRankingUrlクラスの種別に関するプロパティを参照してください。
+         * @param term NicoRankingUrlクラスの期間に関するプロパティを参照してください。
+         * @param genre カテゴリを表す文字列を指定します。例えば"all"や"music"です。デフォルトではall（総合）です。
+         * @param tag
          * @param pageCount ページ番号 「?page=」の後に付ける数字を指定します。0および1の場合は1ページ目です。デフォルトでは1です。
-         * @param category カテゴリを表す文字列を指定します。例えば"all"や"music"です。デフォルトではall（総合）です。
          *
          */
-        public function getRanking(period: int, target: int, pageCount: int = 1, category: String = "all"): void {
-
-            var request: URLRequest;
-            if (period == 5) {
-                request = new URLRequest(NicoRankingUrl.NICO_RANKING_URLS[period][0]);
-            } else {
-                request = new URLRequest(NicoRankingUrl.NICO_RANKING_URLS[period][target] + category);
-            }
+        public function getRanking(term: String, genre: String = "all", tag: String = null, pageCount: int = 1): void {
+            var request: URLRequest = new URLRequest(NicoRankingUrl.getNicoRankingUrl(genre, term, tag, true));
 
             var variables: URLVariables = new URLVariables();
             if (pageCount > 1) {
                 variables.page = pageCount;
             }
-            variables.rss = "2.0";
 
             request.data = variables;
-
             this.load(request);
-
         }
-
     }
 }

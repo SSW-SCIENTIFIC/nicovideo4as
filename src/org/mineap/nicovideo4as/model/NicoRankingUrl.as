@@ -10,60 +10,62 @@ package org.mineap.nicovideo4as.model {
         /**
          * 毎日(期間)
          */
-        public static const DAILY: int = 0;
+        public static const DAILY: String = "24h";
 
         /**
          * 週間(期間)
          */
-        public static const WEEKLEY: int = 1;
+        public static const WEEKLEY: String = "week";
 
         /**
          * 月間(期間)
          */
-        public static const MONTHLY: int = 2;
+        public static const MONTHLY: String = "month";
 
         /**
          * 毎時(期間)
          */
-        public static const HOURLY: int = 3;
+        public static const HOURLY: String = "hour";
 
         /**
          * 合計(期間)
          */
-        public static const TOTAL: int = 4;
+        public static const TOTAL: String = "total";
 
         /**
          * 新着(期間)
          */
-        public static const NEWARRIVAL: int = 5;
-
-
-        /**
-         * マイリスト数(種別)
-         */
-        public static const MYLIST: int = 0;
+        public static const NEW_ARRIVAL: String = "new_arrival";
 
         /**
-         * 再生数(種別)
+         * ニコニコ動画ランキングのURL取得メソッド.
+         * @see https://dwango.github.io/niconico/genre_ranking/ranking_rss/
+         * @param genre ランキングを取得するジャンル名, 旧ランキング(-2019/06)のカテゴリ名に相当すると思われる
+         * @param term 集計期間の定数
+         * @param tag 集計対象のタグ名, 選択可能なタグ名を取得する方法が分からない(2019/07/20)
+         * @param is_rss RSSとして取得するかどうか
+         * @return 指定された条件のランキングRSSのURL
          */
-        public static const VIEW: int = 1;
+        public static function getNicoRankingUrl(genre: String, term: String, tag: String = null, is_rss: Boolean = true): String
+        {
+            if (genre === null || genre === "") {
+                return "https://www.nicovideo.jp/ranking/";
+            }
 
-        /**
-         * コメント数(種別)
-         */
-        public static const COMMENT: int = 2;
+            var options: Array = is_rss ? ["rss=2.0", "lang=ja-jp"] : [];
+            if (tag !== null) {
+                options.push("tag=" + tag);
+            }
+            if (term !== null && term !== NEW_ARRIVAL) {
+                options.push("term=" + term);
+            }
 
-        /**
-         * 総合(種別)
-         */
-        public static const FAV: int = 3;
-
-        /**
-         * ニコニコ動画のランキングURLです。
-         * NICO_RANKING_URLS[ランキング期間][ランキング種別]で指定します。
-         */
-        public static const NICO_RANKING_URLS: Array = new Array(new Array("http://www.nicovideo.jp/ranking/mylist/daily/", "http://www.nicovideo.jp/ranking/view/daily/", "http://www.nicovideo.jp/ranking/res/daily/", "http://www.nicovideo.jp/ranking/fav/daily/"), new Array("http://www.nicovideo.jp/ranking/mylist/weekly/", "http://www.nicovideo.jp/ranking/view/weekly/", "http://www.nicovideo.jp/ranking/res/weekly/", "http://www.nicovideo.jp/ranking/fav/weekly/"), new Array("http://www.nicovideo.jp/ranking/mylist/monthly/", "http://www.nicovideo.jp/ranking/view/monthly/", "http://www.nicovideo.jp/ranking/res/monthly/", "http://www.nicovideo.jp/ranking/fav/monthly/"), new Array("http://www.nicovideo.jp/ranking/mylist/hourly/", "http://www.nicovideo.jp/ranking/view/hourly/", "http://www.nicovideo.jp/ranking/res/hourly/", "http://www.nicovideo.jp/ranking/fav/hourly/"), new Array("http://www.nicovideo.jp/ranking/mylist/total/", "http://www.nicovideo.jp/ranking/view/total/all/", "http://www.nicovideo.jp/ranking/res/total/", "http://www.nicovideo.jp/ranking/fav/total/"), new Array("http://www.nicovideo.jp/newarrival/"));
-
-
+            switch (term) {
+                case NEW_ARRIVAL:
+                    return "https://www.nicovideo.jp/newarrival/?" + options.join("&");
+                default:
+                    return "https://www.nicovideo.jp/ranking/genre/" + genre + "?" + options.join("&");
+            }
+        }
     }
 }
