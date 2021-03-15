@@ -527,7 +527,7 @@ package org.mineap.nicovideo4as {
             }
 
             if (this._isHTML5) {
-                return (this._jsonObj.video.dmcInfo != null);
+                return (this._jsonObj != null);
             }
 
             return false;
@@ -543,7 +543,7 @@ package org.mineap.nicovideo4as {
             }
 
             if (this._isHTML5) {
-                return this._jsonObj.video.dmcInfo;
+                return this._jsonObj;
             }
 
             return null;
