@@ -27,7 +27,7 @@ package org.mineap.nicovideo4as.analyzer {
         }
 
         public function get apiUrl(): String {
-            return this._result.media.delivery.storyboard.session.urls[0].url;
+            return this._result.media.delivery.movie.session.urls[0].url;
         }
 
         public function getSession(hls: Boolean = false): Object {
