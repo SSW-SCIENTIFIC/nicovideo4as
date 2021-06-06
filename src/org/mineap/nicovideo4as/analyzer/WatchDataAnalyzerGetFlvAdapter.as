@@ -70,8 +70,7 @@ package org.mineap.nicovideo4as.analyzer {
 
         override public function get userId(): String {
             if (this.watchDataAnalyzer) {
-                var target: Object = this.watchDataAnalyzer.data.owner || this.watchDataAnalyzer.data.channel || this.watchDataAnalyzer.data.community;
-                return target.id;
+                return this.watchDataAnalyzer.data.viewer.id;
             }
 
             if (this.getflvResultAnalyzer) {
@@ -83,7 +82,7 @@ package org.mineap.nicovideo4as.analyzer {
 
         override public function get ms(): String {
             if (this.watchDataAnalyzer) {
-                return this.watchDataAnalyzer.data.thread.serverUrl;
+                return this.watchDataAnalyzer.data.comment.server.url;
             }
 
             if (this.getflvResultAnalyzer) {
@@ -99,7 +98,7 @@ package org.mineap.nicovideo4as.analyzer {
 
         override public function get url(): String {
             if (this.watchDataAnalyzer) {
-                return this.watchDataAnalyzer.data.video.smileInfo.url;
+                return this.watchDataAnalyzer.data.media.delivery.movie.session.urls[0].url;
             }
 
             if (this.getflvResultAnalyzer) {
@@ -122,9 +121,16 @@ package org.mineap.nicovideo4as.analyzer {
 
         override public function get threadId(): String {
             if (this.watchDataAnalyzer) {
-                return this.watchDataAnalyzer.data.thread.ids.community ||
-                       this.watchDataAnalyzer.data.thread.ids["default"] ||
-                       this.watchDataAnalyzer.data.thread.ids.nicos;
+                for each(var data in this.watchDataAnalyzer.data.comment.threads) {
+                    if(data.label == "community"){
+                        return data.id;
+                    }
+                }
+                for each(var data in this.watchDataAnalyzer.data.comment.threads) {
+                    if(data.label == "default"){
+                        return data.id;
+                    }
+                }
             }
 
             if (this.getflvResultAnalyzer) {
@@ -136,7 +142,7 @@ package org.mineap.nicovideo4as.analyzer {
 
         override public function get needs_key(): int {
             if (this.watchDataAnalyzer) {
-                return this.watchDataAnalyzer.data.commentComposite.threads.some(function (element: Object, index:int, arr:Array): Boolean {
+                return this.watchDataAnalyzer.data.comment.threads.some(function (element: Object, index:int, arr:Array): Boolean {
                     return element.isDefaultPostTarget === true && element.isThreadkeyRequired === true;
                 }) ? 1 : 0;
             }
@@ -150,7 +156,11 @@ package org.mineap.nicovideo4as.analyzer {
 
         override public function get optional_thread_id(): String {
             if (this.watchDataAnalyzer) {
-                return this.watchDataAnalyzer.data.thread.ids["default"];
+                for each(var data in this.watchDataAnalyzer.data.comment.threads) {
+                    if(data.label == "default") {
+                        return data.id;
+                    }
+                }
             }
 
             if (this.getflvResultAnalyzer) {
