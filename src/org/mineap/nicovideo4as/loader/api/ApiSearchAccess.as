@@ -16,8 +16,6 @@ package org.mineap.nicovideo4as.loader.api {
 
         public function search(type: SearchType, target: String, page: int, sort: SearchSortType, order: SearchOrderType): void {
 
-            var url: String = SEARCH_API_ACCESS_URL + type.typeString + "/" + target;
-
             var variables: URLVariables = new URLVariables();
             variables.q = target;
             variables.targets = type.typeString;
@@ -27,7 +25,7 @@ package org.mineap.nicovideo4as.loader.api {
             variables._limit = 100;
             variables._context = "niconico-lib";
 
-            var req: URLRequest = new URLRequest(url);
+            var req: URLRequest = new URLRequest(SEARCH_API_ACCESS_URL);
             req.data = variables;
             req.method = "GET";
 
