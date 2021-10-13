@@ -25,7 +25,7 @@ package org.mineap.nicovideo4as.analyzer {
                 var description: String = obj.description;
 
                 // 投稿日 (yyyy-mm-dd hh:dd:ss)
-                var first_retrieve: String = obj.startTime.replace(/T/, " ");
+                var first_retrieve: String = obj.startTime.replace(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}:\d{2}:\d{2})[-+].+/, "$1年$2月$3日 $4");
 
                 // 動画ID
                 var videoId: String = obj.contentId;
@@ -34,7 +34,7 @@ package org.mineap.nicovideo4as.analyzer {
                 var lastResBody: String = obj.lastResBody;
 
                 // 再生時間("6:28")
-                var lengthStr: String = Math.floor(obj.lengthSeconds / 60) + ":" + obj.lengthSeconds % 60;
+                var lengthStr: String = Math.floor(obj.lengthSeconds / 60) + ":" + ("0" + obj.lengthSeconds % 60).slice(-2);
 
                 // マイリスト数
                 var myListCount: int = obj.mylistCounter;
