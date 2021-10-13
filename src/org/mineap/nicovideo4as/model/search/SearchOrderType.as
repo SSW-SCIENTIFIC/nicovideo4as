@@ -3,12 +3,12 @@ package org.mineap.nicovideo4as.model.search {
         /**
          * 昇順
          */
-        public static const ASCENDING: SearchOrderType = new SearchOrderType("a");
+        public static const ASCENDING: SearchOrderType = new SearchOrderType("+");
 
         /**
          * 降順
          */
-        public static const DESCENDING: SearchOrderType = new SearchOrderType("d");
+        public static const DESCENDING: SearchOrderType = new SearchOrderType("-");
 
         private var _orderString: String;
 

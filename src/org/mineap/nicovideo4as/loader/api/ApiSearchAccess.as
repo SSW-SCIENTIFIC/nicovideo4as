@@ -8,21 +8,24 @@ package org.mineap.nicovideo4as.loader.api {
     import org.mineap.nicovideo4as.model.search.SearchType;
 
     public class ApiSearchAccess extends URLLoader {
-        public static const SEARCH_API_ACCESS_URL: String = "http://ext.nicovideo.jp/api/search/";
+        public static const SEARCH_API_ACCESS_URL: String = "https://api.search.nicovideo.jp/api/v2/snapshot/video/contents/search";
 
         public function ApiSearchAccess(request: URLRequest = null) {
             super(request);
         }
 
-        public function search(type: SearchType, target: String, page: int, sort: SearchSortType, order: SearchOrderType, mode: String = "watch"): void {
+        public function search(type: SearchType, target: String, page: int, sort: SearchSortType, order: SearchOrderType): void {
 
             var url: String = SEARCH_API_ACCESS_URL + type.typeString + "/" + target;
 
             var variables: URLVariables = new URLVariables();
-            variables.mode = mode;
-            variables.page = page;
-            variables.sort = sort.sortTypeString;
-            variables.order = order.orderStr;
+            variables.q = target;
+            variables.targets = type.typeString;
+            variables.fields = "description,startTime,contentId,lastResBody,lengthSeconds,mylistCounter,commentCounter,thumbnailUrl,title,viewCounter";
+            variables._sort = order.orderStr + sort.sortTypeString;
+            variables._offset = page;
+            variables._limit = 100;
+            variables._context = "niconico-lib";
 
             var req: URLRequest = new URLRequest(url);
             req.data = variables;

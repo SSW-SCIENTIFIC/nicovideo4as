@@ -16,40 +16,40 @@ package org.mineap.nicovideo4as.analyzer {
 
             var jsonData: Object = JSON.parse(data);
 
-            this._totalCount = jsonData.count;
+            this._totalCount = jsonData.meta.totalCount;
 
-            var list: Array = jsonData.list;
+            var list: Array = jsonData.data;
 
             for each(var obj: Object in list) {
                 //　説明文
-                var description: String = obj.description_short;
+                var description: String = obj.description;
 
                 // 投稿日 (yyyy-mm-dd hh:dd:ss)
-                var first_retrieve: String = obj.first_retrieve;
+                var first_retrieve: String = obj.startTime.replace(/T/, " ");
 
                 // 動画ID
-                var videoId: String = obj.id;
+                var videoId: String = obj.contentId;
 
                 // 直近のコメント数件
-                var lastResBody: String = obj.last_res_body;
+                var lastResBody: String = obj.lastResBody;
 
                 // 再生時間("6:28")
-                var lengthStr: String = obj.length;
+                var lengthStr: String = Math.floor(obj.lengthSeconds / 60) + ":" + obj.lengthSeconds % 60;
 
                 // マイリスト数
-                var myListCount: int = obj.mylist_counter;
+                var myListCount: int = obj.mylistCounter;
 
                 // コメント数
-                var resCount: int = obj.num_res;
+                var resCount: int = obj.commentCounter;
 
                 // サムネイル画像URL
-                var thumbUrl: String = obj.thumbnail_url;
+                var thumbUrl: String = obj.thumbnailUrl;
 
                 // タイトル
                 var title: String = obj.title;
 
                 // 再生数
-                var view_counter: int = obj.view_counter;
+                var view_counter: int = obj.viewCounter;
 
                 var item: SearchResultItem = new SearchResultItem(title, videoId, thumbUrl, first_retrieve, view_counter, myListCount, resCount, lengthStr, lastResBody);
 

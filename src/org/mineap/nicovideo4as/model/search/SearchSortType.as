@@ -13,32 +13,32 @@ package org.mineap.nicovideo4as.model.search {
         /**
          * 最新のコメント
          */
-        public static const NEW_COMMENT: SearchSortType = new SearchSortType("n");
+        public static const NEW_COMMENT: SearchSortType = new SearchSortType("lastCommentTime");
 
         /**
          * 再生数
          */
-        public static const VIEW_COUNTER: SearchSortType = new SearchSortType("v");
+        public static const VIEW_COUNTER: SearchSortType = new SearchSortType("viewCounter");
 
         /**
          * マイリスト数
          */
-        public static const MYLIST_COUNTER: SearchSortType = new SearchSortType("m");
+        public static const MYLIST_COUNTER: SearchSortType = new SearchSortType("mylistCounter");
 
         /**
          * コメント数
          */
-        public static const NUM_RES: SearchSortType = new SearchSortType("r");
+        public static const NUM_RES: SearchSortType = new SearchSortType("commentCounter");
 
         /**
          * 投稿日
          */
-        public static const FIRST_RETRIVE: SearchSortType = new SearchSortType("f");
+        public static const FIRST_RETRIVE: SearchSortType = new SearchSortType("startTime");
 
         /**
          * 動画の再生時間
          */
-        public static const LENGTH: SearchSortType = new SearchSortType("l");
+        public static const LENGTH: SearchSortType = new SearchSortType("lengthSeconds");
 
         private var _sort: String;
 

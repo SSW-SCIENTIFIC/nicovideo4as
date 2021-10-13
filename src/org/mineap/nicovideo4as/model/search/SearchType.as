@@ -12,11 +12,11 @@ package org.mineap.nicovideo4as.model.search {
         /**
          * 検索種別がキーワードによる検索である事を表す定数です
          */
-        public static const SEARCH: SearchType = new SearchType("search");
+        public static const SEARCH: SearchType = new SearchType("title,description,tags");
         /**
          * 検索種別がタグによる検索である事を表す定数です
          */
-        public static const TAG: SearchType = new SearchType("tag");
+        public static const TAG: SearchType = new SearchType("tagsExact");
 
         private var _type: String;
 
